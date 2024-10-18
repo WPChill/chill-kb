@@ -1,0 +1,74 @@
+.wpchill-kb-rating {
+  padding: $spacing-unit 0;
+  margin-top: $spacing-unit;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .wpchill-kb-rating-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .wpchill-kb-rating-question {
+    font-weight: 500;
+    margin-right: $spacing-unit;
+  }
+
+  .wpchill-kb-rating-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .wpchill-kb-rating-button {
+    background-color: white;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: $primary-color;
+      color: $primary-color;
+    }
+
+    &.wpchill-kb-like {
+      &:active{
+        background-color: lighten($success-color, 40%);
+        border-color: $success-color;
+        color: $success-color;
+      }
+
+
+      &:hover {
+        background-color: #e6f0fc;
+      }
+    }
+  }
+
+  .wpchill-kb-rating-right {
+    font-size: 0.875rem;
+    color: lighten($text-color, 15%);
+  }
+
+
+  .wpchill-kb-likes,
+  .wpchill-kb-dislikes {
+    margin-left: 10px;
+  }
+
+  .wpchill-kb-dislikes {
+    border-left: 1px solid darken($border-color, 50%);
+    padding-left: calc($spacing-unit / 2);
+    margin-left: calc($spacing-unit / 2);
+  }
+}
+
+// Styles for when the user has voted
+.wpchill-kb-rating.voted {
+  .wpchill-kb-rating-buttons {
+    display: none;
+  }
+}

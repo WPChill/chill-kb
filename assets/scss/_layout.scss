@@ -1,0 +1,25 @@
+.wpchill-kb-wrapper {
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.wpchill-kb-content-container {
+  display: flex;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.wpchill-kb-page-container {
+  display: flex;
+  min-height: calc(100vh - 60px);
+  position: relative;
+}
+
+.wpchill-kb-main-content {
+  flex-grow: 1;
+  padding: calc(#{$spacing-unit} * 1.5);
+  overflow-y: auto;
+  width: 70%;
+}

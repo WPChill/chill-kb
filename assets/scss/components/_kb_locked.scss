@@ -1,0 +1,40 @@
+// Variables
+$color-primary: #007bff;
+$color-primary-dark: #0056b3;
+$color-danger-light: #f8d7da;
+$color-danger-border: #f5c6cb;
+$color-danger-text: #721c24;
+$color-white: #ffffff;
+
+$border-radius: 4px;
+$padding-standard: 20px;
+$margin-bottom: 20px;
+
+.wpchill-kb-locked-message {
+  background-color: $color-danger-light;
+  border: 1px solid $color-danger-border;
+  border-radius: $border-radius;
+  color: $color-danger-text;
+  padding: $padding-standard;
+  margin-bottom: $margin-bottom;
+  text-align: center;
+
+
+
+  .wpchill-kb-login-button {
+    display: inline-block;
+    background-color: $color-primary;
+    color: $color-white;
+    padding: $padding-standard / 2 $padding-standard;
+    text-decoration: none;
+    border-radius: $border-radius;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: $color-primary-dark;
+      text-decoration: none;
+      color: $color-white;
+    }
+  }
+}

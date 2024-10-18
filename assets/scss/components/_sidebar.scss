@@ -1,0 +1,63 @@
+.wpchill-kb-sidebar {
+  padding: calc(#{$spacing-unit} * 3);
+  border-right: 1px solid $border-color;
+  width: 30%;
+  background-color: #fafbff;
+  overflow-y: auto;
+
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    height: 100%;
+    right: 100%;
+    left: -100vw;
+    background-color: inherit;
+  }
+
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    margin-bottom: calc($spacing-unit / 2);
+  }
+
+  a {
+    color: $text-color;
+    text-decoration: none;
+
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+
+
+  .wpchill-kb-search-form {
+    position: relative;
+
+    input[type="search"] {
+      width: 100%;
+      padding: calc($spacing-unit / 2);
+      border: 1px solid $border-color;
+      border-radius: 4px;
+      font-size: 1em;
+    }
+
+    button[type="submit"] {
+      position: absolute;
+      right: calc($spacing-unit / 2);
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+}
