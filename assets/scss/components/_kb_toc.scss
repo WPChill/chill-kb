@@ -1,0 +1,18 @@
+.wpchill-kb-toc {
+    ul {
+        line-height: 14px;
+        list-style-type: none;
+        padding-inline-start: 0;
+        li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            a {
+                font-size: 14px;
+                color: #475569;
+                font-weight: 600;
+                text-decoration: none;
+            }
+        }
+    }
+}

@@ -2,10 +2,17 @@
   width: 100%;
   border-bottom: 1px solid $border-color;
   padding: $spacing-unit 0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #fff;
+  body.admin-bar & {
+    top: 32px;
+  }
 
   .wpchill-kb-header {
     max-width: 800px;
-    margin: $spacing-unit auto;
+    margin: 0 auto;
 
 
     .wpchill-kb-search-form {
@@ -19,6 +26,8 @@
         font-size: 16px;
         border: 1px solid $border-color;
         border-radius: 4px 0 0 4px;
+        box-sizing: border-box;
+        height: calc(#{$spacing-unit} * 2);
       }
 
       .wpchill-kb-search-submit {
@@ -29,7 +38,9 @@
         border-radius: 0 4px 4px 0;
         cursor: pointer;
         transition: background-color 0.3s ease;
-
+        height: 100%;
+        min-height: unset;
+        
         &:hover {
           background-color: darken($primary-color, 10%);
         }

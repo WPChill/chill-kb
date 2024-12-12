@@ -36,6 +36,7 @@ class PostType {
 			'menu_position'      => null,
 			'show_in_rest'       => true,
 			'supports'           => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments' ),
+			'taxonomies'         => array( 'kb_category' ),
 		);
 
 		$args = apply_filters( 'wpchill_kb_post_type_args', $args );

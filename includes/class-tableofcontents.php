@@ -47,23 +47,26 @@ class TableOfContents {
 		);
 
 		$post = get_post();
+
+		
 		if ( ! $post ) {
 			return '';
 		}
 
 		$blocks   = parse_blocks( $post->post_content );
+		
 		$headings = $this->extract_headings_from_blocks( $blocks, $atts['depth'] );
-
+		
 		if ( empty( $headings ) ) {
 			return '';
 		}
 
 		$toc  = '<div class="wpchill-kb-toc">';
-		$toc .= '<h2>' . esc_html( $atts['title'] ) . '</h2>';
+		$toc .= '<h3>' . esc_html( $atts['title'] ) . '</h3>';
 		$toc .= '<ul>';
 
 		foreach ( $headings as $heading ) {
-			$toc .= '<li><a href="#h-' . esc_attr( $heading['id'] ) . '">' . esc_html( $heading['text'] ) . '</a></li>';
+			$toc .= '<li><span class="dashicons dashicons-arrow-right-alt2"></span><a href="#' . esc_attr( $heading['id'] ) . '">' . esc_html( $heading['text'] ) . '</a></li>';
 		}
 
 		$toc .= '</ul></div>';
