@@ -1,8 +1,8 @@
 .wpchill-kb-sidebar {
   padding: #{$spacing-unit};
   border-right: 1px solid $border-color;
-  box-sizing: border-box;
-  width: 20%;
+  box-sizing: content-box;
+  width: calc( 20% - ( #{$spacing-unit} * 2 ) );
   background-color: #fafbff;
   overflow-y: auto;
   position: sticky;
@@ -11,6 +11,10 @@
   body.admin-bar & {
     top: calc((#{$spacing-unit} * 4) + 32px);
     height: calc( 100vh - ( #{$spacing-unit} * 4 ) - 32px );
+  }
+  &.wpchill-kb-sidebar-right{
+    border-left: 1px solid $border-color;
+    border-right: unset;
   }
 
   &:after {
@@ -113,8 +117,8 @@
         .wpchill-kb-category-text {
           font-size: 14px;
           color: #475569;
-          white-space: nowrap;
           font-weight: 600;
+          line-height: 16px;
         }
       }
     }

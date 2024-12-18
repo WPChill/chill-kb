@@ -91,7 +91,7 @@ $wkb_child_categories = get_terms(
 						?>
 					</div>
 				</main>
-				<aside class="wpchill-kb-sidebar">
+				<aside class="wpchill-kb-sidebar wpchill-kb-sidebar-right">
 					<?php
 					if ( is_active_sidebar( 'kb-sidebar-right' ) ) {
 						dynamic_sidebar( 'kb-sidebar-right' );

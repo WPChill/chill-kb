@@ -1,18 +1,8 @@
 <?php
-$wkb_plugin      = new WPChill\KB\Plugin();
+$wkb_plugin          = new WPChill\KB\Plugin();
 $wkb_article_locking = new WPChill\KB\ArticleLocking();
 
 $wkb_plugin->get_header();
-
-$current_category = get_queried_object();
-
-$categories = get_terms(
-	array(
-		'taxonomy'   => 'kb_category',
-		'hide_empty' => false,
-	)
-);
-
 
 ?>
 	<header class="wpchill-kb-header-wrapper">
@@ -65,7 +55,7 @@ $categories = get_terms(
 						?>
 					</div>
 				</main>
-				<aside class="wpchill-kb-sidebar">
+				<aside class="wpchill-kb-sidebar wpchill-kb-sidebar-right">
 					<?php
 					if ( is_active_sidebar( 'kb-sidebar-right' ) ) {
 						dynamic_sidebar( 'kb-sidebar-right' );

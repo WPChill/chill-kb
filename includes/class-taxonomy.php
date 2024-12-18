@@ -151,6 +151,13 @@ class Taxonomy {
 	}
 
 	public function register_scripts() {
+
+		$screen = get_current_screen();
+		// Only load in KB category edit screen
+		if ( ! isset( $screen->post_type ) || ! isset( $screen->taxonomy ) || 'kb' !== $screen->post_type || 'kb_category' !== $screen->taxonomy ) {
+			return;
+		}
+
 		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_style( 'wpchill-kb-styles-admin', WPCHILL_KB_PLUGIN_URL . 'assets/css/admin/wpchill-kb-styles-admin.css', array(), WPCHILL_KB_VERSION );
 		wp_enqueue_script( 'modula-category-scripts', WPCHILL_KB_PLUGIN_URL . 'assets/js/admin/wpchill-kb-category.js', array( 'jquery', 'wp-color-picker' ), WPCHILL_KB_VERSION, true );

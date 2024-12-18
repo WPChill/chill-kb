@@ -4,7 +4,7 @@
   "description": "WPChill Knowledge Base Plugin",
   "scripts": {
     "sass:watch": "sass --watch /assets/scss:assets/css",
-    "sass:compile": "sass assets/scss/wpchill-kb.scss assets/css/wpchill-kb-styles.css --style compressed",
+    "sass:compile": "sass assets/scss/wpchill-kb.scss assets/css/wpchill-kb-styles.css --style compressed --no-source-map",
     "sass:compile-admin": "sass assets/scss/admin/wpchill-kb-admin.scss assets/css/admin/wpchill-kb-styles-admin.css --style compressed",
     "start": "npm run sass:watch",
     "build": "npm run sass:compile && npm run sass:compile-admin",
