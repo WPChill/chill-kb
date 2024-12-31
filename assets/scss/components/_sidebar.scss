@@ -1,10 +1,21 @@
 .wpchill-kb-sidebar {
-  padding: calc(#{$spacing-unit} * 3);
+  padding: #{$spacing-unit};
   border-right: 1px solid $border-color;
-  width: 30%;
+  box-sizing: content-box;
+  width: calc( 20% - ( #{$spacing-unit} * 2 ) );
   background-color: #fafbff;
   overflow-y: auto;
-
+  position: sticky;
+  top: calc(#{$spacing-unit} * 4);
+  height: calc( 100vh - ( #{$spacing-unit} * 4 ) );
+  body.admin-bar & {
+    top: calc((#{$spacing-unit} * 4) + 32px);
+    height: calc( 100vh - ( #{$spacing-unit} * 4 ) - 32px );
+  }
+  &.wpchill-kb-sidebar-right{
+    border-left: 1px solid $border-color;
+    border-right: unset;
+  }
 
   &:after {
     content: '';
@@ -59,5 +70,98 @@
       cursor: pointer;
     }
   }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
 
+  .wpchill-kb-category {
+    margin-bottom: 15px;
+
+    .wpchill-kb-dropdown {
+      display: flex;
+      flex-direction: column;
+
+      .wpchill-kb-category-name {
+        display: flex;
+        align-items: center;
+        text-align: left;
+        text-decoration: none;
+        padding: 5px 0px;
+        gap: 5px;
+
+        &:hover {
+          .wpchill-kb-category-text{
+            color: $menu-hover-link;
+          }
+        }
+
+        .toggle-icon {
+          font-size: 16px;
+          transform: rotate(0deg);
+          transition: transform 0.3s ease;
+        }
+
+        .wpchill-kb-icon {
+          font-size: 18px;
+          padding: 3px;
+          color: #fff;
+          align-content: center;
+          width: 24px;
+          height: 24px;
+          box-sizing: border-box;
+          border-radius: 4px;
+        }
+
+        .wpchill-kb-category-text {
+          font-size: 14px;
+          color: #475569;
+          font-weight: 600;
+          line-height: 16px;
+        }
+      }
+    }
+
+    .wpchill-kb-articles-list {
+      display: none;
+      list-style: none;
+      padding-left: 10px;
+      margin-left: 10px;
+      border-left: 1px solid $border-color;
+
+      &.active {
+        display: block;
+      }
+
+      li {
+        margin: 5px 0;
+
+        a {
+          text-decoration: none;
+          color: #555;
+          font-size: 14px;
+          padding: 5px;
+          border-radius: 5px;
+          width: 100%;
+          display: block;
+          font-weight: 500;
+          &.active {
+            background-color: #eef2ff;
+            color: $menu-hover-link;
+          }
+          &:hover {
+            color: $menu-hover-link;
+          }
+        }
+      }
+    }
+    &.active > .wpchill-kb-dropdown {
+      .wpchill-kb-category-name {
+        .toggle-icon {
+            transform: rotate(180deg);
+        }
+      }
+    }
+  }
 }

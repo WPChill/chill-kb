@@ -30,7 +30,12 @@ class ArticleRating {
 	public function display_rating() {
 		global $post;
 
-		if ( self::$rating_displayed || ! $post || $post->post_type !== 'kb' ) {
+		if ( self::$rating_displayed || ! $post || 'kb' !== $post->post_type ) {
+			return;
+		}
+
+		$article_locking = new ArticleLocking();
+		if ( $article_locking->is_article_locked( $post->ID ) && ! is_user_logged_in() ) {
 			return;
 		}
 

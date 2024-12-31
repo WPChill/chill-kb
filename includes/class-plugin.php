@@ -71,4 +71,34 @@ class Plugin {
 		return $this->search->get_search_form();
 	}
 
+	public function get_header() {
+		?>
+		<!DOCTYPE html>
+		<html <?php language_attributes(); ?>>
+		<head>
+			<?php wp_head(); ?>
+		</head>
+		<body <?php body_class(); ?>>
+		<?php
+		if ( current_theme_supports( 'block-templates' ) ) {
+			block_template_part( 'header' );
+		} else {
+			get_header();
+		}
+	}
+
+	public function get_footer() {
+		?>
+		<footer class="wp-block-template-part">
+			<?php
+			if ( current_theme_supports( 'block-templates' ) ) {
+				block_template_part( 'footer' );
+				wp_footer();
+			} else {
+				get_footer();
+			}
+			?>
+		</footer>
+		<?php
+	}
 }

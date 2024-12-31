@@ -1,6 +1,6 @@
 .wpchill-kb-wrapper {
-  max-width: 1300px;
-  margin: 0 auto;
+  max-width: 100%;
+  width: 100%;
 }
 
 .wpchill-kb-content-container {
@@ -18,8 +18,13 @@
 }
 
 .wpchill-kb-main-content {
-  flex-grow: 1;
   padding: calc(#{$spacing-unit} * 1.5);
   overflow-y: auto;
-  width: 70%;
+  width: 60%;
+  box-sizing: border-box;
+
+  .wpchill-kb-main-content-wrap {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
 }

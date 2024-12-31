@@ -38,6 +38,11 @@ class TableOfContents {
 	 * @return string Generated table of contents HTML.
 	 */
 	public function generate_table_of_contents( $atts ) {
+
+		if ( ! is_singular() ) {
+			return '';
+		}
+
 		$atts = shortcode_atts(
 			array(
 				'depth' => 6,
@@ -47,11 +52,13 @@ class TableOfContents {
 		);
 
 		$post = get_post();
+
 		if ( ! $post ) {
 			return '';
 		}
 
-		$blocks   = parse_blocks( $post->post_content );
+		$blocks = parse_blocks( $post->post_content );
+
 		$headings = $this->extract_headings_from_blocks( $blocks, $atts['depth'] );
 
 		if ( empty( $headings ) ) {
@@ -59,11 +66,11 @@ class TableOfContents {
 		}
 
 		$toc  = '<div class="wpchill-kb-toc">';
-		$toc .= '<h2>' . esc_html( $atts['title'] ) . '</h2>';
+		$toc .= '<h3>' . esc_html( $atts['title'] ) . '</h3>';
 		$toc .= '<ul>';
 
 		foreach ( $headings as $heading ) {
-			$toc .= '<li><a href="#h-' . esc_attr( $heading['id'] ) . '">' . esc_html( $heading['text'] ) . '</a></li>';
+			$toc .= '<li><span class="dashicons dashicons-arrow-right-alt2"></span><a href="#' . esc_attr( $heading['id'] ) . '">' . esc_html( $heading['text'] ) . '</a></li>';
 		}
 
 		$toc .= '</ul></div>';
@@ -84,7 +91,10 @@ class TableOfContents {
 			if ( 'core/heading' === $block['blockName'] ) {
 				$level = isset( $block['attrs']['level'] ) ? $block['attrs']['level'] : 2;
 				if ( $level <= $max_depth ) {
-					$id         = isset( $block['attrs']['anchor'] ) ? $block['attrs']['anchor'] : sanitize_title( wp_strip_all_tags( $block['innerHTML'] ) );
+					$id = isset( $block['attrs']['anchor'] )
+						? $block['attrs']['anchor']
+						: 'h-' . sanitize_title( wp_strip_all_tags( $block['innerHTML'] ) );
+
 					$headings[] = array(
 						'level' => $level,
 						'text'  => wp_strip_all_tags( $block['innerHTML'] ),

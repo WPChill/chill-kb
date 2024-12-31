@@ -1,6 +1,6 @@
 .wpchill-kb-search-form {
   position: relative;
-  margin-bottom: $spacing-unit;
+  margin-bottom: 0;
 
   .wpchill-kb-search-field {
     width: 100%;
@@ -36,11 +36,20 @@
   max-height: calc(#{$spacing-unit} * 10);
   overflow-y: auto;
   overflow-x: hidden;
+  z-index: 2;
+  max-width: 800px;
+  box-sizing: border-box;
+  list-style-type: none;
+  padding-inline-start: 0;
 
   .ui-menu-item {
-    padding: calc(#{$spacing-unit} / 2);
+    padding: calc(#{$spacing-unit} / 4) calc(#{$spacing-unit} / 2);
     border-bottom: 1px solid $border-color;
     cursor: pointer;
+    height: calc(#{$spacing-unit} * 2);
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
 
     &:last-child {
       border-bottom: none;
@@ -48,6 +57,11 @@
 
     &:hover {
       background-color: lighten($primary-color, 40%);
+      color: $menu-hover-link
+    }
+
+    .ui-menu-item-wrapper {
+      font-size: 16px;
     }
   }
 }

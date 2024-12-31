@@ -158,7 +158,7 @@ class ArticleLocking {
 	 * @param int $post_id The post ID to check.
 	 * @return bool True if the article is locked, false otherwise.
 	 */
-	private function is_article_locked( $post_id ) {
+	public function is_article_locked( $post_id ) {
 		return 'on' === get_post_meta( $post_id, self::META_KEY, true );
 	}
 

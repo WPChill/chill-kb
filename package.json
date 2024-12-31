@@ -4,9 +4,14 @@
   "description": "WPChill Knowledge Base Plugin",
   "scripts": {
     "sass:watch": "sass --watch /assets/scss:assets/css",
-    "sass:compile": "sass assets/scss/wpchill-kb.scss assets/css/wpchill-kb-styles.css --style compressed",
+    "sass:compile": "sass assets/scss/wpchill-kb.scss assets/css/wpchill-kb-styles.css --style compressed --no-source-map",
+    "sass:compile-admin": "sass assets/scss/admin/wpchill-kb-admin.scss assets/css/admin/wpchill-kb-styles-admin.css --style compressed",
     "start": "npm run sass:watch",
-    "build": "npm run sass:compile"
+    "build": "npm run sass:compile && npm run sass:compile-admin",
+    "plugin-zip": "npm run build && npm run clean && npm run copy && npm run bundle && npm run clean",
+    "clean": "rimraf build",
+    "copy": "node scripts/copy.js",
+    "bundle": "node scripts/bundle.js"
   },
   "keywords": [
     "wordpress",
@@ -16,6 +21,9 @@
   "author": "WPChill",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "sass": "^1.62.1"
+    "sass": "^1.62.1",
+    "archiver": "^7.0.1",
+    "fs-extra": "^11.2.0",
+    "rimraf": "^6.0.1"
   }
 }
