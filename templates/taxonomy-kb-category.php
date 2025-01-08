@@ -81,14 +81,6 @@ $wkb_child_categories = get_terms(
 							endwhile;
 							?>
 						</ul>
-						<?php
-						the_posts_pagination(
-							array(
-								'prev_text' => __( 'Previous page', 'wpchill-kb' ),
-								'next_text' => __( 'Next page', 'wpchill-kb' ),
-							)
-						);
-						?>
 					</div>
 				</main>
 				<aside class="wpchill-kb-sidebar wpchill-kb-sidebar-right">

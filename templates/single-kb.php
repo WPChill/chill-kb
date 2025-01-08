@@ -15,11 +15,14 @@ $wkb_plugin->get_header();
 			<div class="wpchill-kb-sidebar-background"></div>
 			<div class="wpchill-kb-content-container">
 				<aside class="wpchill-kb-sidebar">
-					<?php
-					if ( is_active_sidebar( 'kb-sidebar' ) ) {
-						dynamic_sidebar( 'kb-sidebar' );
-					}
-					?>
+					<div class="wpchill-sidebar-content">
+						<?php
+						if ( is_active_sidebar( 'kb-sidebar' ) ) {
+							dynamic_sidebar( 'kb-sidebar' );
+						}
+						?>
+					</div>
+					<div class="wpchill-sidebar-toggle"><span class="dashicons dashicons-menu"></span></div>
 				</aside>
 				<main class="wpchill-kb-main-content">
 					<div class="wpchill-kb-main-content-wrap">
@@ -56,11 +59,14 @@ $wkb_plugin->get_header();
 					</div>
 				</main>
 				<aside class="wpchill-kb-sidebar wpchill-kb-sidebar-right">
-					<?php
-					if ( is_active_sidebar( 'kb-sidebar-right' ) ) {
-						dynamic_sidebar( 'kb-sidebar-right' );
-					}
-					?>
+					<div class="wpchill-sidebar-content">
+						<?php
+						if ( is_active_sidebar( 'kb-sidebar-right' ) ) {
+							dynamic_sidebar( 'kb-sidebar-right' );
+						}
+						?>
+					</div>
+					<div class="wpchill-sidebar-toggle"><span class="wpchill-toggle-toc"><?php esc_html_e( 'TOC', 'wpchill-kb' ); ?></span></div>
 				</aside>
 			</div>
 		</div>
