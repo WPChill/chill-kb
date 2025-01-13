@@ -18,8 +18,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _state_use_modula_state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../state/use-modula-state */ "./apps/lock-select/state/use-modula-state.js");
 /* harmony import */ var _state_actions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../state/actions */ "./apps/lock-select/state/actions.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _query_useAccessProducts__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../query/useAccessProducts */ "./apps/lock-select/query/useAccessProducts.js");
+/* harmony import */ var _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./lock-select.module.scss */ "./apps/lock-select/components/lock-select.module.scss");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
+
+
 
 
 
@@ -31,24 +35,41 @@ function AccessSelector() {
     dispatch
   } = (0,_state_use_modula_state__WEBPACK_IMPORTED_MODULE_2__.useModulaState)();
   const {
-    selectedType
+    selectedType,
+    postId
   } = state;
   const options = [{
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Not Locked', 'text-domain'),
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Not Locked', 'wpchill-kb'),
     value: 'not_locked'
   }, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Members Only', 'text-domain'),
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Members Only', 'wpchill-kb'),
     value: 'members_only'
-  }, {
-    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Active Subscription', 'text-domain'),
-    value: 'active_subscription'
   }];
   const handleChange = selectedValue => {
     dispatch((0,_state_actions__WEBPACK_IMPORTED_MODULE_3__.setSelectedType)(selectedValue));
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_0__.SelectControl, {
-      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Access Level', 'text-domain'),
+  const {
+    data,
+    isLoading,
+    error
+  } = (0,_query_useAccessProducts__WEBPACK_IMPORTED_MODULE_4__.useAccessProducts)(postId);
+  if (isLoading) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+      className: _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_5__["default"].spinnerWrapper,
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_0__.Spinner, {
+        className: _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_5__["default"].spinner
+      })
+    });
+  }
+  if (!error && data) {
+    options.push({
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Active Subscription', 'wpchill-kb'),
+      value: 'active_subscription'
+    });
+  }
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_0__.SelectControl, {
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Access Level', 'wpchill-kb'),
       name: "wpchill_kb_access_type",
       value: selectedType || options[0].value,
       options: options,
@@ -102,17 +123,62 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ ProductSelector)
 /* harmony export */ });
+/* harmony import */ var _state_use_modula_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../state/use-modula-state */ "./apps/lock-select/state/use-modula-state.js");
+/* harmony import */ var _query_useAccessProducts__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../query/useAccessProducts */ "./apps/lock-select/query/useAccessProducts.js");
+/* harmony import */ var _product_type_selector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./product-type-selector */ "./apps/lock-select/components/product-type-selector.jsx");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+function ProductSelector() {
+  const {
+    state
+  } = (0,_state_use_modula_state__WEBPACK_IMPORTED_MODULE_0__.useModulaState)();
+  const {
+    postId,
+    selectedProducts
+  } = state;
+  const {
+    data,
+    error
+  } = (0,_query_useAccessProducts__WEBPACK_IMPORTED_MODULE_1__.useAccessProducts)(postId);
+  if (error || !data) {
+    return null;
+  }
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
+    children: [data.map(productType => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_product_type_selector__WEBPACK_IMPORTED_MODULE_2__["default"], {
+      productType: productType
+    }, productType.slug)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("input", {
+      type: "hidden",
+      name: `wpchill_kb_access_products`,
+      value: JSON.stringify(selectedProducts)
+    })]
+  });
+}
+
+/***/ }),
+
+/***/ "./apps/lock-select/components/product-type-selector.jsx":
+/*!***************************************************************!*\
+  !*** ./apps/lock-select/components/product-type-selector.jsx ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ ProductTypeSelector)
+/* harmony export */ });
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _state_use_modula_state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../state/use-modula-state */ "./apps/lock-select/state/use-modula-state.js");
 /* harmony import */ var _state_actions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../state/actions */ "./apps/lock-select/state/actions.js");
-/* harmony import */ var _query_useAccessProducts__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../query/useAccessProducts */ "./apps/lock-select/query/useAccessProducts.js");
-/* harmony import */ var _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./lock-select.module.scss */ "./apps/lock-select/components/lock-select.module.scss");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
-
+/* harmony import */ var _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./lock-select.module.scss */ "./apps/lock-select/components/lock-select.module.scss");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__);
 
 
 
@@ -163,60 +229,26 @@ function ProductTypeSelector({
     });
     dispatch((0,_state_actions__WEBPACK_IMPORTED_MODULE_3__.setSelectedProducts)(updatedSelectedProducts));
   };
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_0__.ComboboxControl, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_0__.ComboboxControl, {
       multiple: true,
-      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)(`Search`, 'text-domain') + ` ${productType.name}`,
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)(`Search`, 'wpchill-kb') + ` ${productType.name}`,
       value: null,
       onChange: handleAdd,
       allowReset: false,
       options: productType.products.filter(product => !selectedProductsForType.includes(product.value))
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("ul", {
-      className: _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_5__["default"].selectedProducts,
-      children: validSelectedProducts.map(product => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("li", {
-        className: _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_5__["default"].selectedProduct,
-        children: [productType.products.find(p => p.value === product)?.label || product, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("button", {
-          className: _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_5__["default"].selectedProductButton,
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("ul", {
+      className: _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].selectedProducts,
+      children: validSelectedProducts.map(product => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("li", {
+        className: _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].selectedProduct,
+        children: [productType.products.find(p => p.value === product)?.label || product, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("button", {
+          className: _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].selectedProductButton,
           type: "button",
           onClick: () => handleRemove(product),
-          "aria-label": (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Remove Product', 'text-domain'),
+          "aria-label": (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Remove Product', 'wpchill-kb'),
           children: "\xD7"
         })]
       }, product))
-    })]
-  });
-}
-function ProductSelector() {
-  const {
-    state
-  } = (0,_state_use_modula_state__WEBPACK_IMPORTED_MODULE_2__.useModulaState)();
-  const {
-    postId,
-    selectedProducts
-  } = state;
-  const {
-    data,
-    isLoading,
-    error
-  } = (0,_query_useAccessProducts__WEBPACK_IMPORTED_MODULE_4__.useAccessProducts)(postId);
-  if (isLoading) {
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
-      className: _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_5__["default"].spinnerWrapper,
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_0__.Spinner, {
-        className: _lock_select_module_scss__WEBPACK_IMPORTED_MODULE_5__["default"].spinner
-      })
-    });
-  }
-  if (error || !data) {
-    return null;
-  }
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-    children: [data.map(productType => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(ProductTypeSelector, {
-      productType: productType
-    }, productType.slug)), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("input", {
-      type: "hidden",
-      name: `wpchill_kb_access_products`,
-      value: JSON.stringify(selectedProducts)
     })]
   });
 }

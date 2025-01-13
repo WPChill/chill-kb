@@ -13,6 +13,7 @@ class Plugin {
 	private $sidebar;
 	private $article_locking;
 	private $table_of_contents;
+	private $rest_api;
 
 	public function __construct() {
 		global $wpchill_kb_errors;
@@ -30,6 +31,7 @@ class Plugin {
 			$this->sidebar           = new Sidebar();
 			$this->article_locking   = new ArticleLocking();
 			$this->table_of_contents = new TableOfContents();
+			$this->rest_api          = new RestAPI();
 
 			// Register the shortcode using a closure
 			add_shortcode(
@@ -38,8 +40,6 @@ class Plugin {
 					return $this->table_of_contents->generate_table_of_contents( $atts );
 				}
 			);
-
-
 		} catch ( Exception $e ) {
 			$wpchill_kb_errors[] = 'Error in Plugin constructor: ' . $e->getMessage();
 		}
@@ -53,7 +53,7 @@ class Plugin {
 			$this->loader->add_action( 'init', $this->taxonomy, 'register' );
 			$this->loader->add_filter( 'template_include', $this->templates, 'include_template' );
 			$this->loader->add_action( 'wp_enqueue_scripts', $this->assets, 'enqueue_styles' );
-
+			$this->loader->add_action( 'rest_api_init', $this->rest_api, 'register_routes' );
 
 			$this->loader->run();
 		} catch ( Exception $e ) {
