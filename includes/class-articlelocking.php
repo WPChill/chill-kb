@@ -19,21 +19,27 @@ class ArticleLocking {
 	 *
 	 * @var string
 	 */
-	const META_KEY = '_wpchill_kb_locked';
+	const TYPE_META_KEY = '_wpchill_kb_locked_type';
+
+	/**
+	 * Meta key used to store the locked status of an article.
+	 *
+	 * @var string
+	 */
+	const PRODUCTS_META_KEY = '_wpchill_kb_locked_products';
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		add_action( 'add_meta_boxes_kb', array( $this, 'add_lock_meta_box' ) );
-		add_action( 'save_post_kb', array( $this, 'save_lock_meta_box' ), 10, 2 );
+		add_action( 'save_post_kb', array( $this, 'save_lock_meta_box' ) );
 		add_filter( 'the_content', array( $this, 'filter_locked_content' ), 999 );
 		add_filter( 'wpchill_kb_article_classes', array( $this, 'add_locked_class' ), 10, 2 );
 		add_action( 'wpchill_kb_before_article_content', array( $this, 'display_locked_message' ) );
 		add_filter( 'wpchill_kb_search_args', array( $this, 'modify_search_args' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
 	}
-
-
 
 	/**
 	 * Add the lock meta box to the KB post editor.
@@ -41,14 +47,14 @@ class ArticleLocking {
 	 * @param \WP_Post $post The post object.
 	 * @return void
 	 */
-	public function add_lock_meta_box( $post ) {
+	public function add_lock_meta_box() {
 		add_meta_box(
 			'wpchill_kb_lock_article',
 			__( 'Article Access', 'wpchill-kb' ),
 			array( $this, 'render_lock_meta_box' ),
 			'kb',
 			'side',
-			'default'
+			'high',
 		);
 	}
 
@@ -60,12 +66,16 @@ class ArticleLocking {
 	 */
 	public function render_lock_meta_box( $post ) {
 		wp_nonce_field( 'wpchill_kb_lock_article', 'wpchill_kb_lock_article_nonce' );
-		$is_locked = get_post_meta( $post->ID, self::META_KEY, true );
+
+		$type      = get_post_meta( $post->ID, self::TYPE_META_KEY, true );
+		$selection = get_post_meta( $post->ID, self::PRODUCTS_META_KEY, true );
+
 		?>
-        <p>
-            <input type="checkbox" id="wpchill_kb_lock_article" name="wpchill_kb_lock_article" <?php checked( $is_locked, 'on' ); ?>>
-            <label for="wpchill_kb_lock_article"><?php esc_html_e( 'Lock this article (only visible to logged-in users)', 'wpchill-kb' ); ?></label>
-        </p>
+			<div id="lock-article-metabox" 
+				data-postId="<?php echo esc_attr( $post->ID ); ?>"
+				data-type="<?php echo ! empty( $type ) ? esc_attr( $type ) : 'not_locked'; ?>"
+				data-selected="<?php echo ! empty( $selection ) ? esc_attr( $selection ) : '[]'; ?>">
+			</div>
 		<?php
 	}
 
@@ -76,7 +86,7 @@ class ArticleLocking {
 	 * @param \WP_Post $post    The post object being saved.
 	 * @return void
 	 */
-	public function save_lock_meta_box( $post_id, $post ) {
+	public function save_lock_meta_box( $post_id ) {
 		if ( ! isset( $_POST['wpchill_kb_lock_article_nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['wpchill_kb_lock_article_nonce'] ), 'wpchill_kb_lock_article' ) ) {
 			return;
 		}
@@ -89,8 +99,13 @@ class ArticleLocking {
 			return;
 		}
 
-		$is_locked = isset( $_POST['wpchill_kb_lock_article'] ) ? 'on' : 'off';
-		update_post_meta( $post_id, self::META_KEY, $is_locked );
+		if ( ! empty( $_POST['wpchill_kb_access_products'] ) ) {
+			update_post_meta( $post_id, self::PRODUCTS_META_KEY, sanitize_text_field( wp_unslash( $_POST['wpchill_kb_access_products'] ) ) );
+		}
+
+		if ( ! empty( $_POST['wpchill_kb_access_type'] ) ) {
+			update_post_meta( $post_id, self::TYPE_META_KEY, sanitize_text_field( wp_unslash( $_POST['wpchill_kb_access_type'] ) ) );
+		}
 	}
 
 	/**
@@ -109,7 +124,7 @@ class ArticleLocking {
 			return $this->get_locked_message( $post_id );
 		}
 
-		return do_shortcode($content);
+		return do_shortcode( $content );
 	}
 
 
@@ -146,7 +161,7 @@ class ArticleLocking {
 	 */
 	public function modify_search_args( $args ) {
 		if ( ! is_user_logged_in() ) {
-			$args['meta_query'] = isset( $args['meta_query'] ) ? $args['meta_query'] : array();
+			$args['meta_query']   = isset( $args['meta_query'] ) ? $args['meta_query'] : array();
 			$args['meta_query'][] = $this->get_unlocked_meta_query();
 		}
 		return $args;
@@ -159,7 +174,7 @@ class ArticleLocking {
 	 * @return bool True if the article is locked, false otherwise.
 	 */
 	public function is_article_locked( $post_id ) {
-		return 'on' === get_post_meta( $post_id, self::META_KEY, true );
+		return 'not_locked' !== get_post_meta( $post_id, self::TYPE_META_KEY, true );
 	}
 
 	/**
@@ -200,6 +215,39 @@ class ArticleLocking {
 				'key'     => self::META_KEY,
 				'compare' => 'NOT EXISTS',
 			),
+		);
+	}
+
+	public function register_scripts() {
+
+		$screen = get_current_screen();
+		// Only load in KB article edit screen
+		if ( ! isset( $screen->post_type ) || ! isset( $screen->base ) || 'kb' !== $screen->post_type || 'post' !== $screen->base ) {
+			return;
+		}
+
+		$asset_file = require WPCHILL_KB_PLUGIN_DIR . '/assets/lock-select/index.asset.php';
+		$enqueue    = array(
+			'handle'       => 'wpchill-kb-lock-select',
+			'dependencies' => $asset_file['dependencies'],
+			'version'      => $asset_file['version'],
+			'script'       => WPCHILL_KB_PLUGIN_URL . '/assets/lock-select/index.js',
+			'style'        => WPCHILL_KB_PLUGIN_URL . '/assets/lock-select/index.css',
+		);
+
+		wp_enqueue_script(
+			$enqueue['handle'],
+			$enqueue['script'],
+			$enqueue['dependencies'],
+			$enqueue['version'],
+			true
+		);
+
+		wp_enqueue_style(
+			$enqueue['handle'],
+			$enqueue['style'],
+			array( 'wp-components' ),
+			$enqueue['version']
 		);
 	}
 }
