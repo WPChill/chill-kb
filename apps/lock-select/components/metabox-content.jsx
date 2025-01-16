@@ -1,9 +1,9 @@
-import { useModulaState } from '../state/use-modula-state';
+import { useKnowledgeBaseState } from '../state/use-knowledge-base-state';
 import AccessSelector from './access-selector';
 import ProductSelector from './product-selector';
 
 export default function MetaboxContent() {
-	const { state } = useModulaState();
+	const { state } = useKnowledgeBaseState();
 	const { selectedType } = state;
 
 	return (

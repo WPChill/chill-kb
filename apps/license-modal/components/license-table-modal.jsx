@@ -1,23 +1,23 @@
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useModulaState } from '../state/use-modula-state';
+import { useKnowledgeBaseState } from '../state/use-knowledge-base-state';
 import { toggleModal } from '../state/actions';
 import LicenseTable from './license-table';
 
 export default function LicenseTableModal() {
-	const { dispatch } = useModulaState();
+	const { dispatch } = useKnowledgeBaseState();
 
 	const closeModal = () => {
 		dispatch( toggleModal( false ) );
 	};
 
 	return <Modal
-		title={ __( 'Select license action', 'modula-instagram' ) }
+		title={ __( 'Select license action', 'wpchill-kb' ) }
 		onRequestClose={ closeModal }
 		isFullScreen={ true }
 		isBusy={ true }
 		className="licenseTableModal"
-		closeButtonLabel={ __( 'Close', 'modula-instagram' ) }>
+		closeButtonLabel={ __( 'Close', 'wpchill-kb' ) }>
 		<LicenseTable />
 	</Modal>;
 }

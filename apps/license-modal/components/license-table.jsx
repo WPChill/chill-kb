@@ -1,10 +1,10 @@
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { useModulaState } from '../state/use-modula-state';
+import { useKnowledgeBaseState } from '../state/use-knowledge-base-state';
 import styles from './licenses-modal.module.scss';
 
 export default function LicenseTableModal() {
-	const { state } = useModulaState();
+	const { state } = useKnowledgeBaseState();
 	const { licensesData } = state;
 
 	const hasLicenseKeys = licensesData.some( ( license ) => license.key );

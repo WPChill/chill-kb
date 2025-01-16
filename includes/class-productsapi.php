@@ -320,7 +320,7 @@ class ProductsAPI {
 		foreach ( $this->get_locked_downloads( $post_id, 'woo' ) as $product_id ) {
 			$product = wc_get_product( absint( $product_id ) );
 
-			if ( ! $product || ! $product->is_type( 'subscription' ) ) {
+			if ( ! $product ) {
 				continue;
 			}
 
@@ -374,6 +374,17 @@ class ProductsAPI {
 		$locking_products   = array_map( 'absint', $this->get_locked_downloads( $post_id, 'woo' ) );
 		$user_id            = get_current_user_id();
 		$buy_link_set       = false;
+
+		// Check for simple products.
+		foreach ( $locking_products as $product_id ) {
+			// Check if the user has purchased the product.
+			if ( wc_customer_bought_product( '', $user_id, $product_id ) ) {
+				$product = wc_get_product( $product_id );
+				if ( 'subscription' !== $product->get_type() ) {
+					return false; // User has access.
+				}
+			}
+		}
 
 		// Getting all user subscriptions
 		$subscriptions = wcs_get_subscriptions(

@@ -1,12 +1,12 @@
 import { SelectControl, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useModulaState } from '../state/use-modula-state';
+import { useKnowledgeBaseState } from '../state/use-knowledge-base-state';
 import { setSelectedType } from '../state/actions';
 import { useAccessProducts } from '../query/useAccessProducts';
 import styles from './lock-select.module.scss';
 
 export default function AccessSelector() {
-	const { state, dispatch } = useModulaState();
+	const { state, dispatch } = useKnowledgeBaseState();
 	const { selectedType, postId } = state;
 
 	const options = [
