@@ -36,9 +36,9 @@ class ArticleLocking {
 		add_action( 'save_post_kb', array( $this, 'save_lock_meta_box' ) );
 		add_filter( 'the_content', array( $this, 'filter_locked_content' ), 999 );
 		add_filter( 'wpchill_kb_article_classes', array( $this, 'add_locked_class' ), 10, 2 );
-		add_action( 'wpchill_kb_before_article_content', array( $this, 'display_locked_message' ) );
 		add_filter( 'wpchill_kb_search_args', array( $this, 'modify_search_args' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'register_admin_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ) );
 	}
 
 	/**
@@ -120,8 +120,19 @@ class ArticleLocking {
 		}
 
 		$post_id = get_the_ID();
-		if ( $this->is_article_locked( $post_id ) && ! is_user_logged_in() ) {
-			return $this->get_locked_message( $post_id );
+
+		if ( $this->is_article_locked( $post_id ) ) {
+			if ( ! is_user_logged_in() ) {
+				return $this->get_locked_message( $post_id );
+			}
+
+			if ( 'active_subscription' === get_post_meta( $post_id, self::TYPE_META_KEY, true ) ) {
+				$show_license_message = ProductsAPI::get_instance()->get_license_message( $post_id );
+				if ( $show_license_message ) {
+					remove_action( 'wpchill_kb_rating', array( ArticleRating::get_instance(), 'display_rating' ) );
+					return $show_license_message;
+				}
+			}
 		}
 
 		return do_shortcode( $content );
@@ -140,17 +151,6 @@ class ArticleLocking {
 			$classes[] = 'wpchill-kb-locked';
 		}
 		return $classes;
-	}
-
-	/**
-	 * Display a locked message before the article content if it's locked.
-	 *
-	 * @param int $post_id The post ID.
-	 */
-	public function display_locked_message( $post_id ) {
-		if ( $this->is_article_locked( $post_id ) && ! is_user_logged_in() ) {
-			echo $this->get_locked_message( $post_id );
-		}
 	}
 
 	/**
@@ -207,18 +207,23 @@ class ArticleLocking {
 		return array(
 			'relation' => 'OR',
 			array(
-				'key'     => self::META_KEY,
-				'value'   => 'on',
-				'compare' => '!=',
+				'key'     => self::TYPE_META_KEY,
+				'value'   => 'not_locked',
+				'compare' => '==',
 			),
 			array(
-				'key'     => self::META_KEY,
+				'key'     => self::TYPE_META_KEY,
 				'compare' => 'NOT EXISTS',
 			),
 		);
 	}
 
-	public function register_scripts() {
+	/**
+	 * Registers the admin react scripts for article access selector.
+	 *
+	 * @return void
+	 */
+	public function register_admin_scripts() {
 
 		$screen = get_current_screen();
 		// Only load in KB article edit screen
@@ -233,6 +238,41 @@ class ArticleLocking {
 			'version'      => $asset_file['version'],
 			'script'       => WPCHILL_KB_PLUGIN_URL . '/assets/lock-select/index.js',
 			'style'        => WPCHILL_KB_PLUGIN_URL . '/assets/lock-select/index.css',
+		);
+
+		wp_enqueue_script(
+			$enqueue['handle'],
+			$enqueue['script'],
+			$enqueue['dependencies'],
+			$enqueue['version'],
+			true
+		);
+
+		wp_enqueue_style(
+			$enqueue['handle'],
+			$enqueue['style'],
+			array( 'wp-components' ),
+			$enqueue['version']
+		);
+	}
+
+	/**
+	 * Registers the frontend react scripts for licenses/subscriptions renews and purchases from locked KB articles.
+	 *
+	 * @return void
+	 */
+	public function register_scripts() {
+		if ( ! is_singular( 'kb' ) ) {
+			return;
+		}
+
+		$asset_file = require WPCHILL_KB_PLUGIN_DIR . '/assets/license-modal/index.asset.php';
+		$enqueue    = array(
+			'handle'       => 'wpchill-kb-license-modal',
+			'dependencies' => $asset_file['dependencies'],
+			'version'      => $asset_file['version'],
+			'script'       => WPCHILL_KB_PLUGIN_URL . '/assets/license-modal/index.js',
+			'style'        => WPCHILL_KB_PLUGIN_URL . '/assets/license-modal/index.css',
 		);
 
 		wp_enqueue_script(
