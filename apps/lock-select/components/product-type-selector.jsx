@@ -16,20 +16,21 @@ export default function ProductTypeSelector( { productType } ) {
 	);
 
 	const handleAdd = ( newValue ) => {
-		if ( newValue && ! selectedProductsForType.includes( newValue ) ) {
-			const updatedSelectedProducts = selectedProducts.map( ( item ) => {
-				if ( item.key === productType.slug ) {
-					return { ...item, products: [ ...item.products, newValue ] };
-				}
-				return item;
-			} );
-
-			if ( ! updatedSelectedProducts.some( ( item ) => item.key === productType.slug ) ) {
-				updatedSelectedProducts.push( { key: productType.slug, products: [ newValue ] } );
-			}
-
-			dispatch( setSelectedProducts( updatedSelectedProducts ) );
+		if ( ! newValue || selectedProductsForType.includes( newValue ) ) {
+			return;
 		}
+		const updatedSelectedProducts = selectedProducts.map( ( item ) => {
+			if ( item.key === productType.slug ) {
+				return { ...item, products: [ ...item.products, newValue ] };
+			}
+			return item;
+		} );
+
+		if ( ! updatedSelectedProducts.some( ( item ) => item.key === productType.slug ) ) {
+			updatedSelectedProducts.push( { key: productType.slug, products: [ newValue ] } );
+		}
+
+		dispatch( setSelectedProducts( updatedSelectedProducts ) );
 	};
 
 	const handleRemove = ( valueToRemove ) => {
