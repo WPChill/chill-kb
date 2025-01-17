@@ -182,10 +182,10 @@ class ProductsAPI {
 	}
 
 	/**
-	 * Retrieves the license message for a locked post.
+	 * Retrieves unlocking options data for a locked post.
 	 *
 	 * @param int $post_id The ID of the post to check.
-	 * @return mixed A modal with license information or false to show original content.
+	 * @return array
 	 */
 	public function get_license_modal_data( $post_id ) {
 		// If we got here it means the article is locked and the user is logged in.
@@ -545,6 +545,12 @@ class ProductsAPI {
 		);
 	}
 
+	/**
+	 * Renders a buy/upgrade/renew button if only one options is available to the customer.
+	 *
+	 * @param array button data.
+	 * @return array
+	 */
 	private function render_button( $data ) {
 		return sprintf(
 			'<a href="%s" class="wpchill-kb-login-button">%s %s</a>',
@@ -554,6 +560,11 @@ class ProductsAPI {
 		);
 	}
 
+	/**
+	 * Renders the root element for the license actions modal.
+	 *
+	 * @return string The HTML for the root element, or an empty string if the post ID is not available.
+	 */
 	private function render_modal_root() {
 		global $post;
 
