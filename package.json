@@ -4,14 +4,20 @@
   "description": "WPChill Knowledge Base Plugin",
   "scripts": {
     "sass:watch": "sass --watch /assets/scss:assets/css",
-    "sass:compile": "sass assets/scss/wpchill-kb.scss assets/css/wpchill-kb-styles.css --style compressed --no-source-map",
+    "sass:compile": "sass assets/scss/wpchill-kb.scss assets/css/wpchill-kb-styles.css --style compressed",
     "sass:compile-admin": "sass assets/scss/admin/wpchill-kb-admin.scss assets/css/admin/wpchill-kb-styles-admin.css --style compressed",
+    "build:lock-select": "wp-scripts build apps/lock-select/index.js --output-path=./assets/lock-select",
+    "start:lock-select": "wp-scripts start apps/lock-select/index.js --output-path=./assets/lock-select",
+    "build:license-modal": "wp-scripts build apps/license-modal/index.js --output-path=./assets/license-modal",
+    "start:license-modal": "wp-scripts start apps/license-modal/index.js --output-path=./assets/license-modal",
     "start": "npm run sass:watch",
-    "build": "npm run sass:compile && npm run sass:compile-admin",
+    "build": "npm run sass:compile && npm run sass:compile-admin && npm run build:lock-select && npm run build:license-modal",
     "plugin-zip": "npm run build && npm run clean && npm run copy && npm run bundle && npm run clean",
     "clean": "rimraf build",
     "copy": "node scripts/copy.js",
-    "bundle": "node scripts/bundle.js"
+    "bundle": "node scripts/bundle.js",
+    "lint:js": "wp-scripts lint-js apps/**/*.js",
+    "lint:js-fix": "wp-scripts lint-js apps/**/*.js* --fix"
   },
   "keywords": [
     "wordpress",
@@ -20,10 +26,29 @@
   ],
   "author": "WPChill",
   "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@tanstack/react-query": "^5.52.0",
+    "@wordpress/api-fetch": "^7.11.0",
+    "@wordpress/components": "^28.11.0",
+    "@wordpress/element": "^6.11.0",
+    "@wordpress/i18n": "^5.11.0",
+    "react-window": "^1.8.10",
+    "react-window-infinite-loader": "^1.0.9"
+  },
   "devDependencies": {
-    "sass": "^1.62.1",
+    "@babel/core": "^7.25.2",
+    "@babel/eslint-parser": "^7.25.1",
+    "@tanstack/eslint-plugin-query": "^5.53.0",
+    "@wordpress/babel-plugin-makepot": "^6.11.0",
+    "@wordpress/prettier-config": "^4.11.0",
+    "@wordpress/scripts": "^30.4.0",
     "archiver": "^7.0.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
     "fs-extra": "^11.2.0",
+    "glob": "^11.0.0",
     "rimraf": "^6.0.1"
   }
 }

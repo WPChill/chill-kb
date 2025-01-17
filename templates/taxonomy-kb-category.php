@@ -38,11 +38,14 @@ $wkb_child_categories = get_terms(
 			<div class="wpchill-kb-sidebar-background"></div>
 			<div class="wpchill-kb-content-container">
 				<aside class="wpchill-kb-sidebar">
-					<?php
-					if ( is_active_sidebar( 'kb-sidebar' ) ) {
-						dynamic_sidebar( 'kb-sidebar' );
-					}
-					?>
+					<div class="wpchill-sidebar-content">
+						<?php
+						if ( is_active_sidebar( 'kb-sidebar' ) ) {
+							dynamic_sidebar( 'kb-sidebar' );
+						}
+						?>
+					</div>
+					<div class="wpchill-sidebar-toggle"><span class="dashicons dashicons-menu"></span></div>
 				</aside>
 				<main class="wpchill-kb-main-content">
 					<div class="wpchill-kb-main-content-wrap">
@@ -58,7 +61,7 @@ $wkb_child_categories = get_terms(
 
 								$wkb_category_icon = get_term_meta( $wkb_child_category->term_id, 'icon', true );
 								$wkb_category_icon = $wkb_category_icon ? $wkb_category_icon : 'dashicons-category';
-								
+
 								?>
 								<li class="wpchill-kb-category">
 									<a href="<?php echo esc_url( get_term_link( $wkb_child_category ) ); ?>">
@@ -84,11 +87,13 @@ $wkb_child_categories = get_terms(
 					</div>
 				</main>
 				<aside class="wpchill-kb-sidebar wpchill-kb-sidebar-right">
+					<div class="wpchill-sidebar-content">
 					<?php
 					if ( is_active_sidebar( 'kb-sidebar-right' ) ) {
 						dynamic_sidebar( 'kb-sidebar-right' );
 					}
 					?>
+					</div>
 				</aside>
 			</div>
 		</div>

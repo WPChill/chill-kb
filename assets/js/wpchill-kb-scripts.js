@@ -19,15 +19,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelectorAll('.wpchill-sidebar-toggle').forEach(button => {
         button.addEventListener('click', function () {
-          // Găsim părintele butonului care are clasa .wpchill-kb-sidebar
           const parentSidebar = this.closest('.wpchill-kb-sidebar');
       
           if (parentSidebar) {
-            // Dacă părintele are deja clasa 'open', o eliminăm
             if (parentSidebar.classList.contains('open')) {
               parentSidebar.classList.remove('open');
             } else {
-              // Dacă nu, eliminăm 'open' de pe toate sidebarele și o adăugăm pe părinte
               document.querySelectorAll('.wpchill-kb-sidebar.open').forEach(sidebar => {
                 sidebar.classList.remove('open');
               });
