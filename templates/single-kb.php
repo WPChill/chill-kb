@@ -37,9 +37,6 @@ $wkb_plugin->get_header();
 						while ( have_posts() ) :
 							the_post();
 
-							// This action hook will display the locked message if necessary
-							do_action( 'wpchill_kb_before_article_content' );
-
 							$post_classes = apply_filters( 'wpchill_kb_article_classes', array( 'wpchill-kb-article' ), get_the_ID() );
 							?>
 							<article id="post-<?php the_ID(); ?>" <?php post_class( $post_classes ); ?>>
@@ -49,12 +46,14 @@ $wkb_plugin->get_header();
 									echo $wkb_article_locking->filter_locked_content( get_the_content() );
 									?>
 								</div>
+								<?php
+								// The rating action will be displayed only if the content is not locked or the user is logged in
+								do_action( 'wpchill_kb_rating' );
+								?>
 							</article>
 							<?php
 						endwhile;
 
-						// The rating action will be displayed only if the content is not locked or the user is logged in
-						do_action( 'wpchill_kb_rating' );
 						?>
 					</div>
 				</main>

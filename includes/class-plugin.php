@@ -27,7 +27,7 @@ class Plugin {
 			$this->templates         = new Templates();
 			$this->assets            = new Assets();
 			$this->search            = new Search();
-			$this->article_rating    = new ArticleRating();
+			$this->article_rating    = ArticleRating::get_instance();
 			$this->sidebar           = new Sidebar();
 			$this->article_locking   = new ArticleLocking();
 			$this->table_of_contents = new TableOfContents();
