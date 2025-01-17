@@ -1,13 +1,34 @@
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { Button, Spinner } from '@wordpress/components';
 import { useKnowledgeBaseState } from '../state/use-knowledge-base-state';
+import { useModalLicenses } from '../query/useModalLicenses';
 import styles from './licenses-modal.module.scss';
 
 export default function LicenseTableModal() {
 	const { state } = useKnowledgeBaseState();
-	const { licensesData } = state;
+	const { postId } = state;
 
-	const hasLicenseKeys = licensesData.some( ( license ) => license.key );
+	const { data, isLoading, error } = useModalLicenses( postId );
+
+	if ( isLoading ) {
+		return (
+			<div className={ styles.spinnerWrapper }>
+				<Spinner className={ styles.spinner } />
+			</div>
+		);
+	}
+
+	if ( error || ! data || data.length === 0 ) {
+		return (
+			<div className={ styles.errorWrapper }>
+				<p className={ styles.errorMessage }>
+					{ __( 'Could not find any upgrade options.', 'wpchill-kb' ) }
+				</p>
+			</div>
+		);
+	}
+
+	const hasLicenseKeys = data.some( ( license ) => license.key );
 
 	return (
 		<div>
@@ -20,7 +41,7 @@ export default function LicenseTableModal() {
 					</tr>
 				</thead>
 				<tbody>
-					{ licensesData.map( ( license, index ) => (
+					{ data.map( ( license, index ) => (
 						<tr key={ index }>
 							<td>{ license.title }</td>
 							{ hasLicenseKeys && <td className={ styles.key }>{ license.key }</td> }

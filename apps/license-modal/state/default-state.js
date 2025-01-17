@@ -1,4 +1,4 @@
-export const initialState = ( licenses ) => ( {
+export const initialState = ( postId ) => ( {
 	isModalOpen: false,
-	licensesData: JSON.parse( licenses ),
+	postId,
 } );

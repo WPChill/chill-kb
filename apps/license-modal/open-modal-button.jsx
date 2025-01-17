@@ -5,7 +5,7 @@ import { toggleModal } from './state/actions';
 import { useKnowledgeBaseState } from './state/use-knowledge-base-state';
 import { useCallback } from '@wordpress/element';
 
-export default function InstagramConnector() {
+export default function OpenModalButton() {
 	const { state, dispatch } = useKnowledgeBaseState();
 
 	const handleClick = useCallback( ( evt ) => {
@@ -16,7 +16,7 @@ export default function InstagramConnector() {
 	return (
 		<>
 			<Button
-				variant={ 'primary' }
+				className="kbLicensesOptionsButton"
 				onClick={ handleClick }
 			>
 				{ __( 'See Options', 'wpchill-kb' ) }
