@@ -1,9 +1,9 @@
-import { useModulaState } from '../state/use-modula-state';
+import { useKnowledgeBaseState } from '../state/use-knowledge-base-state';
 import { useAccessProducts } from '../query/useAccessProducts';
 import ProductTypeSelector from './product-type-selector';
 
 export default function ProductSelector() {
-	const { state } = useModulaState();
+	const { state } = useKnowledgeBaseState();
 	const { postId, selectedProducts } = state;
 	const { data, error } = useAccessProducts( postId );
 

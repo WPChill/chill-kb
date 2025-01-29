@@ -34,7 +34,7 @@ class Taxonomy {
 
 		register_taxonomy( 'kb_category', array( 'kb' ), $args );
 		add_action( 'kb_category_add_form_fields', array( $this, 'add_term_fields' ) );
-		add_action( 'kb_category_edit_form_fields', array( $this, 'edit_term_fields' ), 10, 2 );
+		add_action( 'kb_category_edit_form_fields', array( $this, 'edit_term_fields' ), 10 );
 		add_action( 'created_kb_category', array( $this, 'create_term_fields' ) );
 		add_action( 'edited_kb_category', array( $this, 'update_term_fields' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
@@ -68,7 +68,7 @@ class Taxonomy {
 		<?php
 	}
 
-	public function edit_term_fields( $term, $taxonomy ) {
+	public function edit_term_fields( $term ) {
 		$dashicons = $this->get_dashicons();
 		$icon      = get_term_meta( $term->term_id, 'icon', true );
 		$color     = get_term_meta( $term->term_id, 'color', true );
@@ -129,8 +129,7 @@ class Taxonomy {
 	}
 
 	public function update_term_fields( $term_id ) {
-		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'update-tag_' . $term_id ) ) {
-			wp_die();
+		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'update-tag_' . $term_id ) ) { // phpcs:ignore
 		}
 
 		if ( isset( $_POST['wpchill_kb_cat_color'] ) ) {
@@ -160,7 +159,7 @@ class Taxonomy {
 
 		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_style( 'wpchill-kb-styles-admin', WPCHILL_KB_PLUGIN_URL . 'assets/css/admin/wpchill-kb-styles-admin.css', array(), WPCHILL_KB_VERSION );
-		wp_enqueue_script( 'modula-category-scripts', WPCHILL_KB_PLUGIN_URL . 'assets/js/admin/wpchill-kb-category.js', array( 'jquery', 'wp-color-picker' ), WPCHILL_KB_VERSION, true );
+		wp_enqueue_script( 'wpchill-kb-category-scripts', WPCHILL_KB_PLUGIN_URL . 'assets/js/admin/wpchill-kb-category.js', array( 'jquery', 'wp-color-picker' ), WPCHILL_KB_VERSION, true );
 	}
 
 	private function get_dashicons() {

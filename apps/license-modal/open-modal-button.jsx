@@ -2,11 +2,11 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import LicenseTableModal from './components/license-table-modal';
 import { toggleModal } from './state/actions';
-import { useModulaState } from './state/use-modula-state';
+import { useKnowledgeBaseState } from './state/use-knowledge-base-state';
 import { useCallback } from '@wordpress/element';
 
-export default function InstagramConnector() {
-	const { state, dispatch } = useModulaState();
+export default function OpenModalButton() {
+	const { state, dispatch } = useKnowledgeBaseState();
 
 	const handleClick = useCallback( ( evt ) => {
 		evt.preventDefault();
@@ -16,7 +16,7 @@ export default function InstagramConnector() {
 	return (
 		<>
 			<Button
-				variant={ 'primary' }
+				className="kbLicensesOptionsButton"
 				onClick={ handleClick }
 			>
 				{ __( 'See Options', 'wpchill-kb' ) }

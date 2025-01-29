@@ -1,4 +1,4 @@
-import { useModulaState } from '../state/use-modula-state';
+import { useKnowledgeBaseState } from '../state/use-knowledge-base-state';
 import { useQuery } from '@tanstack/react-query';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -12,7 +12,7 @@ const fetchAccessProducts = async ( postId ) => {
 };
 
 export const useAccessProducts = () => {
-	const { state } = useModulaState();
+	const { state } = useKnowledgeBaseState();
 
 	const data = useQuery( {
 		queryKey: [ 'accessProducts', state.postId ],

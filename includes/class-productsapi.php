@@ -182,6 +182,31 @@ class ProductsAPI {
 	}
 
 	/**
+	 * Retrieves unlocking options data for a locked post.
+	 *
+	 * @param int $post_id The ID of the post to check.
+	 * @return array
+	 */
+	public function get_license_modal_data( $post_id ) {
+		// If we got here it means the article is locked and the user is logged in.
+		$data = array();
+
+		// Do Easy Digital Download license check
+		$edd = $this->check_edd_license( $post_id );
+		if ( false !== $edd ) {
+			$data = $edd;
+		}
+
+		// Do WooCommerce subscription check
+		$woo = $this->check_woo_subscription( $post_id );
+		if ( false !== $woo ) {
+			$data = array_merge( $data, $woo );
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Checks the EDD license for the current user for a specific post.
 	 *
 	 * @param int $post_id The ID of the post to check.
@@ -192,15 +217,22 @@ class ProductsAPI {
 			return false;
 		}
 
+		$locking_products = array_map( 'absint', $this->get_locked_downloads( $post_id ) );
+
+		// No products to check against.
+		if ( empty( $locking_products ) ) {
+			return false;
+		}
+
 		$purchases  = edd_get_users_purchases( get_current_user_id(), 20, true, 'any' );
 		$modal_data = array();
 
 		// Get the cheapest product required.
 		$cheapest_downloads = $this->get_cheapest_edd_products( $post_id );
 		$cheapest_download  = absint( array_key_first( $cheapest_downloads ) );
-		$locking_products   = array_map( 'absint', $this->get_locked_downloads( $post_id ) );
+
 		// No purchase, no license.
-		if ( ! $purchases ) {
+		if ( ! $purchases && 0 !== $cheapest_download ) {
 
 			// Set-up purchase url.
 			$url = add_query_arg(
@@ -214,7 +246,7 @@ class ProductsAPI {
 			$modal_data[] = array(
 				'type'     => __( 'Purchase', 'wpchill-kb' ),
 				'download' => $cheapest_download,
-				'title'    => get_the_title( $cheapest_download ),
+				'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 				'url'      => $url,
 			);
 
@@ -260,15 +292,7 @@ class ProductsAPI {
 				$modal_data[] = array(
 					'type'     => __( 'Renew', 'wpchill-kb' ),
 					'download' => $download,
-					'title'    => get_the_title( $download ),
-					'key'      => $key,
-					'url'      => $esl->get_renewal_url( $license->ID ),
-				);
-			} elseif ( 'expired' === $status ) {
-				$modal_data[] = array(
-					'type'     => __( 'Renew', 'wpchill-kb' ),
-					'download' => $download,
-					'title'    => get_the_title( $download ),
+					'title'    => html_entity_decode( get_the_title( $download ), ENT_QUOTES, 'UTF-8' ),
 					'key'      => $key,
 					'url'      => $esl->get_renewal_url( $license->ID ),
 				);
@@ -279,7 +303,7 @@ class ProductsAPI {
 						$modal_data[] = array(
 							'type'     => __( 'Upgrade', 'wpchill-kb' ),
 							'download' => $upgrade['download_id'],
-							'title'    => get_the_title( $upgrade['download_id'] ),
+							'title'    => html_entity_decode( get_the_title( $upgrade['download_id'] ), ENT_QUOTES, 'UTF-8' ),
 							'key'      => $key,
 							'url'      => edd_sl_get_license_upgrade_url( $license->ID, $upgrade_id ),
 						);
@@ -288,7 +312,22 @@ class ProductsAPI {
 				}
 			}
 		}
-
+		// No upgrades?
+		if ( empty( $modal_data ) && 0 !== $cheapest_download ) {
+			$url          = add_query_arg(
+				array(
+					'edd_action'  => 'add_to_cart',
+					'download_id' => $cheapest_download,
+				),
+				esc_url_raw( edd_get_checkout_uri() )
+			);
+			$modal_data[] = array(
+				'type'     => __( 'Purchase', 'wpchill-kb' ),
+				'download' => $cheapest_download,
+				'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
+				'url'      => $url,
+			);
+		}
 		return $modal_data;
 	}
 
@@ -320,7 +359,7 @@ class ProductsAPI {
 		foreach ( $this->get_locked_downloads( $post_id, 'woo' ) as $product_id ) {
 			$product = wc_get_product( absint( $product_id ) );
 
-			if ( ! $product || ! $product->is_type( 'subscription' ) ) {
+			if ( ! $product ) {
 				continue;
 			}
 
@@ -375,6 +414,17 @@ class ProductsAPI {
 		$user_id            = get_current_user_id();
 		$buy_link_set       = false;
 
+		// Check for simple products.
+		foreach ( $locking_products as $product_id ) {
+			// Check if the user has purchased the product.
+			if ( wc_customer_bought_product( '', $user_id, $product_id ) ) {
+				$product = wc_get_product( $product_id );
+				if ( 'subscription' !== $product->get_type() ) {
+					return false; // User has access.
+				}
+			}
+		}
+
 		// Getting all user subscriptions
 		$subscriptions = wcs_get_subscriptions(
 			array(
@@ -398,7 +448,7 @@ class ProductsAPI {
 			$modal_data[] = array(
 				'type'     => __( 'Purchase', 'wpchill-kb' ),
 				'download' => $cheapest_download,
-				'title'    => get_the_title( $cheapest_download ),
+				'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 				'url'      => $url,
 			);
 
@@ -422,7 +472,7 @@ class ProductsAPI {
 						$modal_data[] = array(
 							'type'     => __( 'Resubscribe', 'wpchill-kb' ),
 							'download' => $download,
-							'title'    => get_the_title( $download ),
+							'title'    => html_entity_decode( get_the_title( $download ), ENT_QUOTES, 'UTF-8' ),
 							'url'      => wcs_get_users_resubscribe_link( $subscription ),
 						);
 					} elseif ( ! $buy_link_set ) {
@@ -436,7 +486,7 @@ class ProductsAPI {
 						$modal_data[] = array(
 							'type'     => __( 'Purchase', 'wpchill-kb' ),
 							'download' => $cheapest_download,
-							'title'    => get_the_title( $cheapest_download ),
+							'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 							'url'      => $url,
 						);
 						$buy_link_set = true;
@@ -453,7 +503,7 @@ class ProductsAPI {
 					$modal_data[] = array(
 						'type'     => __( 'Purchase', 'wpchill-kb' ),
 						'download' => $cheapest_download,
-						'title'    => get_the_title( $cheapest_download ),
+						'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 						'url'      => $url,
 					);
 
@@ -483,30 +533,48 @@ class ProductsAPI {
 				</div>';
 		}
 
-		if ( 1 === count( $data ) ) {
-			return sprintf(
-				'<div class="wpchill-kb-locked-message">
-					<h3>%s</h3>
-					<p>%s</p>
-					<p><a href="%s" class="wpchill-kb-login-button">%s %s</a></p>
-				</div>',
-				esc_html__( 'This article requires an adequate license to view.', 'wpchill-kb' ),
-				esc_html__( 'To access this content, please purchase or upgrade a license.', 'wpchill-kb' ),
-				esc_url( $data[0]['url'] ),
-				( isset( $data[0]['type'] ) ) ? esc_html( $data[0]['type'] ) : esc_html__( 'Purchase', 'wpchill-kb' ),
-				esc_html( $data[0]['title'] )
-			);
-		}
-
 		return sprintf(
 			'<div class="wpchill-kb-locked-message">
 				<h3>%s</h3>
 				<p>%s</p>
-				<div id="wpchill-kb-license-actions" data-licenses="%s"></div>
+				<p>%s</p>
 			</div>',
 			esc_html__( 'This article requires an adequate license to view.', 'wpchill-kb' ),
 			esc_html__( 'To access this content, please purchase or upgrade a license.', 'wpchill-kb' ),
-			esc_attr( wp_json_encode( $data ) )
+			1 === count( $data ) ? wp_kses_post( $this->render_button( $data[0] ) ) : $this->render_modal_root(),
+		);
+	}
+
+	/**
+	 * Renders a buy/upgrade/renew button if only one options is available to the customer.
+	 *
+	 * @param array button data.
+	 * @return array
+	 */
+	private function render_button( $data ) {
+		return sprintf(
+			'<a href="%s" class="wpchill-kb-login-button">%s %s</a>',
+			esc_url( $data['url'] ),
+			esc_html( $data['type'] ),
+			esc_html( $data['title'] )
+		);
+	}
+
+	/**
+	 * Renders the root element for the license actions modal.
+	 *
+	 * @return string The HTML for the root element, or an empty string if the post ID is not available.
+	 */
+	private function render_modal_root() {
+		global $post;
+
+		if ( ! isset( $post->ID ) || 0 === $post->ID ) {
+			return '';
+		}
+
+		return sprintf(
+			'<div id="wpchill-kb-license-actions" data-postid="%d"></div>',
+			esc_attr( $post->ID ),
 		);
 	}
 }

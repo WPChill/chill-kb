@@ -51,7 +51,7 @@ class Search {
 				throw new \Exception( __( 'No search term provided', 'wpchill-kb' ) );
 			}
 
-			$search_term = sanitize_text_field( $_POST['search'] );
+			$search_term = sanitize_text_field( wp_unslash( $_POST['search'] ) );
 			$this->log_debug( 'Search term: ' . $search_term );
 
 			// Check for spam using Akismet
@@ -87,7 +87,6 @@ class Search {
 			$this->log_debug( 'Search results: ' . print_r( $results, true ) );
 
 			wp_send_json_success( $results );
-
 		} catch ( \Exception $e ) {
 			$this->log_debug( 'Exception caught: ' . $e->getMessage() );
 			wp_send_json_error(
@@ -115,8 +114,8 @@ class Search {
 						"\r\n" .
 						$query_string;
 			$response     = '';
-
-			if ( false !== ( $fs = @fsockopen( $akismet_api_host, $akismet_api_port, $errno, $errstr, 10 ) ) ) {
+			$fs = @fsockopen( $akismet_api_host, $akismet_api_port, $errno, $errstr, 10 );
+			if ( false !== $fs ) {
 				fwrite( $fs, $request );
 				while ( ! feof( $fs ) ) {
 					$response .= fgets( $fs, 1160 );
@@ -124,7 +123,7 @@ class Search {
 				fclose( $fs );
 				$response = explode( "\r\n\r\n", $response, 2 );
 				$this->log_debug( 'Akismet raw response: ' . $response[1] );
-				return $response[1] === 'true';
+				return true === $response[1];
 			} else {
 				$this->log_debug( 'Failed to connect to Akismet' );
 				return false;
