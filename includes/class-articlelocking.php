@@ -185,16 +185,50 @@ class ArticleLocking {
 	 */
 	private function get_locked_message( $post_id ) {
 		$login_url = wp_login_url( get_permalink( $post_id ) );
+
+		$title   = esc_html__( 'Log in to read this article.', 'wpchill-kb' );
+		$message = wp_kses_post( __( '<p class="wpchill-kb-login-text">To access this content, log in or create an account by making a purchase.', 'wpchill-kb' ) );
+		$buttons = sprintf( '<a href="/pricing" class="wpchill-kb-login-button">%s</a><a href="%s" class="wpchill-kb-login-button">%s</a>', esc_html__( 'See pricing', 'wpchill-kb' ), esc_url( $login_url ), esc_html__( 'Log in', 'wpchill-kb' ) );
+
+		if ( 'active_subscription' === get_post_meta( $post_id, self::TYPE_META_KEY, true ) ) {
+			$products_api      = ProductsAPI::get_instance();
+			$cheapest_download = 0;
+			$purchase_url      = '';
+			if ( $products_api->is_edd_active() ) {
+				$cheapest_download = $products_api->get_cheapest_edd_products( $post_id, true );
+				$purchase_url      = add_query_arg(
+					array(
+						'edd_action'  => 'add_to_cart',
+						'download_id' => $cheapest_download,
+					),
+					esc_url_raw( edd_get_checkout_uri() )
+				);
+			} elseif ( $products_api->is_woo_active() ) {
+				$cheapest_download = $products_api->get_cheapest_woo_products( $post_id, true );
+				$purchase_url      = add_query_arg(
+					array(
+						'add-to-cart' => $cheapest_download,
+					),
+					esc_url_raw( wc_get_checkout_url() )
+				);
+			}
+			if ( ! empty( $cheapest_download ) && 0 !== $cheapest_download ) {
+				$title    = esc_html__( 'You need a subscription to read this article.', 'wpchill-kb' );
+				$message  = sprintf( wp_kses_post( __( '<p class="wpchill-kb-sub-req-text">To see this article, you must have an active subscription of at least <strong>%s</strong></p>', 'wpchill-kb' ) ), html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ) );
+				$buttons  = sprintf( '<a href="%s" class="wpchill-kb-login-button">%s</a>', esc_url( $login_url ), esc_html__( 'Log in', 'wpchill-kb' ) );
+				$buttons .= sprintf( '<a href="%s" class="wpchill-kb-login-button">%s</a>', esc_url( $purchase_url ), esc_html__( 'Purchase plan', 'wpchill-kb' ) );
+			}
+		}
+
 		return sprintf(
 			'<div class="wpchill-kb-locked-message">
-				<h2>%s</h2>
+				<h2 style="font-size:30px;">%s</h2>
+				%s
 				<p>%s</p>
-				<p><a href="%s" class="wpchill-kb-login-button">%s</a></p>
 			</div>',
-			esc_html__( 'This article is for logged-in users only', 'wpchill-kb' ),
-			esc_html__( 'To access this content, please log in or create an account.', 'wpchill-kb' ),
-			esc_url( $login_url ),
-			esc_html__( 'Log In', 'wpchill-kb' )
+			$title,
+			$message,
+			$buttons
 		);
 	}
 

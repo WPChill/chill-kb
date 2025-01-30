@@ -42,6 +42,9 @@ class ArticleRating {
 			return;
 		}
 
+		$rated_posts = isset( $_COOKIE['wpchill_kb_rated'] ) ? json_decode( stripslashes( $_COOKIE['wpchill_kb_rated'] ), true ) : array();
+
+
 		$article_locking = new ArticleLocking();
 		if ( $article_locking->is_article_locked( $post->ID ) && ! is_user_logged_in() ) {
 			return;
@@ -57,8 +60,10 @@ class ArticleRating {
 			<div class="wpchill-kb-rating-left">
 				<span class="wpchill-kb-rating-question">Was this article helpful?</span>
 				<div class="wpchill-kb-rating-buttons">
+					<?php if ( ! is_array( $rated_posts ) || ! in_array( $post->ID, $rated_posts, true ) ) : ?>
 					<button class="wpchill-kb-rating-button wpchill-kb-like" data-rating="like">👍 Yes</button>
 					<button class="wpchill-kb-rating-button wpchill-kb-dislike" data-rating="dislike">👎 No</button>
+					<?php endif; ?>
 				</div>
 			</div>
 			<div class="wpchill-kb-rating-right">
@@ -152,6 +157,12 @@ class ArticleRating {
 			wp_send_json_error( 'Invalid data' );
 		}
 
+		$rated_posts = isset( $_COOKIE['wpchill_kb_rated'] ) ? json_decode( stripslashes( $_COOKIE['wpchill_kb_rated'] ), true ) : array();
+
+		if ( is_array( $rated_posts ) && in_array( $post_id, $rated_posts, true ) ) {
+			wp_send_json_error( 'You have already rated this article.' );
+		}
+
 		$likes    = (int) get_post_meta( $post_id, 'wpchill_kb_likes', true );
 		$dislikes = (int) get_post_meta( $post_id, 'wpchill_kb_dislikes', true );
 
@@ -163,6 +174,9 @@ class ArticleRating {
 
 		update_post_meta( $post_id, 'wpchill_kb_likes', $likes );
 		update_post_meta( $post_id, 'wpchill_kb_dislikes', $dislikes );
+
+		$rated_posts[] = $post_id;
+		setcookie( 'wpchill_kb_rated', json_encode( $rated_posts ), time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
 
 		$total_votes     = $likes + $dislikes;
 		$like_percentage = $total_votes > 0 ? round( ( $likes / $total_votes ) * 100, 1 ) : 0;

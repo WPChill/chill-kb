@@ -12,7 +12,7 @@ export default function LicenseTableModal() {
 	};
 
 	return <Modal
-		title={ __( 'Select license action', 'wpchill-kb' ) }
+		title={ __( 'Choose the license you want to upgrade', 'wpchill-kb' ) }
 		onRequestClose={ closeModal }
 		isFullScreen={ true }
 		isBusy={ true }

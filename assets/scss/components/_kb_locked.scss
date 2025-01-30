@@ -19,8 +19,6 @@ $margin-bottom: 20px;
   margin-bottom: $margin-bottom;
   text-align: center;
 
-
-
   .wpchill-kb-login-button {
     display: inline-block;
     background-color: $color-primary;
@@ -30,11 +28,18 @@ $margin-bottom: 20px;
     border-radius: $border-radius;
     font-weight: bold;
     transition: background-color 0.3s ease;
+    margin-right: 10px;
 
     &:hover {
       background-color: $color-primary-dark;
       text-decoration: none;
       color: $color-white;
     }
+  }
+  .wpchill-kb-login-text{
+    font-size: 21px;
+  }
+  .wpchill-kb-sub-req-text{
+    font-size: 22px;
   }
 }

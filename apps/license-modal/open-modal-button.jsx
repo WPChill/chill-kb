@@ -19,7 +19,7 @@ export default function OpenModalButton() {
 				className="kbLicensesOptionsButton"
 				onClick={ handleClick }
 			>
-				{ __( 'See Options', 'wpchill-kb' ) }
+				{ __( 'Upgrade Your Plan', 'wpchill-kb' ) }
 			</Button>
 			{ state.isModalOpen && <LicenseTableModal /> }
 		</>

@@ -67,7 +67,7 @@ class ProductsAPI {
 	 *
 	 * @return bool True if both EDD and EDD SL are active, false otherwise.
 	 */
-	private function is_edd_active() {
+	public function is_edd_active() {
 
 		$is_edd_active    = class_exists( 'Easy_Digital_Downloads' );
 		$is_edd_sl_active = class_exists( 'EDD_Software_Licensing' );
@@ -80,7 +80,7 @@ class ProductsAPI {
 	 *
 	 * @return bool True if both WooCommerce and WooCommerce Subscriptions are active, false otherwise.
 	 */
-	private function is_woo_active() {
+	public function is_woo_active() {
 
 		$is_woo_active     = class_exists( 'WooCommerce' );
 		$is_woo_sub_active = class_exists( 'WC_Subscriptions' );
@@ -247,6 +247,7 @@ class ProductsAPI {
 				'type'     => __( 'Purchase', 'wpchill-kb' ),
 				'download' => $cheapest_download,
 				'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
+				'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 				'url'      => $url,
 			);
 
@@ -293,6 +294,7 @@ class ProductsAPI {
 					'type'     => __( 'Renew', 'wpchill-kb' ),
 					'download' => $download,
 					'title'    => html_entity_decode( get_the_title( $download ), ENT_QUOTES, 'UTF-8' ),
+					'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 					'key'      => $key,
 					'url'      => $esl->get_renewal_url( $license->ID ),
 				);
@@ -303,7 +305,8 @@ class ProductsAPI {
 						$modal_data[] = array(
 							'type'     => __( 'Upgrade', 'wpchill-kb' ),
 							'download' => $upgrade['download_id'],
-							'title'    => html_entity_decode( get_the_title( $upgrade['download_id'] ), ENT_QUOTES, 'UTF-8' ),
+							'title'    => html_entity_decode( get_the_title( $download ), ENT_QUOTES, 'UTF-8' ),
+							'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 							'key'      => $key,
 							'url'      => edd_sl_get_license_upgrade_url( $license->ID, $upgrade_id ),
 						);
@@ -325,6 +328,7 @@ class ProductsAPI {
 				'type'     => __( 'Purchase', 'wpchill-kb' ),
 				'download' => $cheapest_download,
 				'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
+				'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 				'url'      => $url,
 			);
 		}
@@ -337,13 +341,19 @@ class ProductsAPI {
 	 * @param int $post_id The ID of the post to check.
 	 * @return array An associative array of product IDs and their prices.
 	 */
-	private function get_cheapest_edd_products( $post_id ) {
+	public function get_cheapest_edd_products( $post_id, $first = false ) {
 		$download_price = array();
 
 		foreach ( $this->get_locked_downloads( $post_id ) as $product_id ) {
 			$download_price[ absint( $product_id ) ] = floor( edd_get_download_price( absint( $product_id ) ) );
 		}
+
 		asort( $download_price );
+
+		if ( $first ) {
+			return absint( array_key_first( $download_price ) );
+		}
+
 		return $download_price;
 	}
 
@@ -353,7 +363,7 @@ class ProductsAPI {
 	 * @param int $post_id The ID of the post to check.
 	 * @return array An associative array of product IDs and their prices.
 	 */
-	private function get_cheapest_woo_products( $post_id ) {
+	public function get_cheapest_woo_products( $post_id, $first = false ) {
 		$download_price = array();
 
 		foreach ( $this->get_locked_downloads( $post_id, 'woo' ) as $product_id ) {
@@ -366,6 +376,11 @@ class ProductsAPI {
 			$download_price[ absint( $product_id ) ] = floor( $product->get_price() );
 		}
 		asort( $download_price );
+
+		if ( $first ) {
+			return absint( array_key_first( $download_price ) );
+		}
+
 		return $download_price;
 	}
 
@@ -449,6 +464,7 @@ class ProductsAPI {
 				'type'     => __( 'Purchase', 'wpchill-kb' ),
 				'download' => $cheapest_download,
 				'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
+				'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 				'url'      => $url,
 			);
 
@@ -487,6 +503,7 @@ class ProductsAPI {
 							'type'     => __( 'Purchase', 'wpchill-kb' ),
 							'download' => $cheapest_download,
 							'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
+							'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 							'url'      => $url,
 						);
 						$buy_link_set = true;
@@ -504,6 +521,7 @@ class ProductsAPI {
 						'type'     => __( 'Purchase', 'wpchill-kb' ),
 						'download' => $cheapest_download,
 						'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
+						'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 						'url'      => $url,
 					);
 
@@ -535,12 +553,12 @@ class ProductsAPI {
 
 		return sprintf(
 			'<div class="wpchill-kb-locked-message">
-				<h3>%s</h3>
-				<p>%s</p>
+				<h2 style="font-size:30px;">%s</h2>
+				<p class="wpchill-kb-sub-req-text">%s</p>
 				<p>%s</p>
 			</div>',
-			esc_html__( 'This article requires an adequate license to view.', 'wpchill-kb' ),
-			esc_html__( 'To access this content, please purchase or upgrade a license.', 'wpchill-kb' ),
+			esc_html__( 'You need a subscription to read this article.', 'wpchill-kb' ),
+			sprintf( wp_kses_post( __( 'To see this article, you must have an active subscription of at least <strong>%s</strong>', 'wpchill-kb' ) ), isset( $data[0]['least'] ) ? $data[0]['least'] : $data[0]['title'] ),
 			1 === count( $data ) ? wp_kses_post( $this->render_button( $data[0] ) ) : $this->render_modal_root(),
 		);
 	}

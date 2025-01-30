@@ -8,6 +8,7 @@ class Search {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'wp_ajax_wpchill_kb_search', array( $this, 'ajax_search' ) );
 		add_action( 'wp_ajax_nopriv_wpchill_kb_search', array( $this, 'ajax_search' ) );
+		add_action( 'pre_get_posts', array( $this, 'filter_search_query' ) );
 	}
 
 	public function enqueue_scripts() {
@@ -214,5 +215,11 @@ class Search {
 		</form>
 		<?php
 		return ob_get_clean();
+	}
+
+	public function filter_search_query( $query ) {
+		if ( $query->is_search() && ! is_admin() && isset( $_GET['post_type'] ) && 'wpchill_kb' === $_GET['post_type'] ) {
+			$query->set( 'post_type', 'kb' );
+		}
 	}
 }

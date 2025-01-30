@@ -35,7 +35,7 @@ export default function LicenseTableModal() {
 			<table className={ styles.tableModern }>
 				<thead>
 					<tr>
-						<th>{ __( 'Product Name', 'wpchill-kb' ) }</th>
+						<th>{ __( 'Current Plan', 'wpchill-kb' ) }</th>
 						{ hasLicenseKeys && <th>{ __( 'License Key', 'wpchill-kb' ) }</th> }
 						<th>{ __( 'Action', 'wpchill-kb' ) }</th>
 					</tr>
