@@ -5,7 +5,8 @@ $wkb_plugin->get_header();
 $terms = get_terms(
 	array(
 		'taxonomy'   => 'kb_category',
-		'hide_empty' => false,
+		'hide_empty' => true,
+		'parent'     => 0,
 	)
 );
 

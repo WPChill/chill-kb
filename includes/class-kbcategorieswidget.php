@@ -99,7 +99,7 @@ class KBCategoriesWidget extends \WP_Widget {
 			'taxonomy'   => 'kb_category',
 			'orderby'    => sanitize_key( $orderby ),
 			'order'      => sanitize_key( $order ),
-			'hide_empty' => false,
+			'hide_empty' => true,
 			'parent'     => 0,
 		);
 
@@ -133,7 +133,7 @@ class KBCategoriesWidget extends \WP_Widget {
 		$subcategories = get_terms(
 			array(
 				'taxonomy'   => 'kb_category',
-				'hide_empty' => false,
+				'hide_empty' => true,
 				'parent'     => $category->term_id,
 			)
 		);

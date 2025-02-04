@@ -174,7 +174,8 @@ class ArticleLocking {
 	 * @return bool True if the article is locked, false otherwise.
 	 */
 	public function is_article_locked( $post_id ) {
-		return 'not_locked' !== get_post_meta( $post_id, self::TYPE_META_KEY, true );
+		$lock = get_post_meta( $post_id, self::TYPE_META_KEY, true );
+		return ( 'members_only' === $lock || 'active_subscription' === $lock );
 	}
 
 	/**
