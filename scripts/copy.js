@@ -6,7 +6,7 @@ const buildDir = path.join( __dirname, '../build' );
 
 // Define directories and files to copy
 const dirsToCopy = [ 'includes', 'assets', 'templates' ];
-const filesToCopy = [ 'README.md', 'wpchill-kb.php' ];
+const filesToCopy = [ 'README.md', 'wpchill-kb.php', 'readme.txt' ];
 
 // Ensure build directory exists
 fs.ensureDirSync( buildDir );

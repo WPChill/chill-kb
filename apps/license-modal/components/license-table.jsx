@@ -3,6 +3,7 @@ import { Button, Spinner } from '@wordpress/components';
 import { useKnowledgeBaseState } from '../state/use-knowledge-base-state';
 import { useModalLicenses } from '../query/useModalLicenses';
 import styles from './licenses-modal.module.scss';
+import { Markup } from 'interweave';
 
 export default function LicenseTableModal() {
 	const { state } = useKnowledgeBaseState();
@@ -18,7 +19,7 @@ export default function LicenseTableModal() {
 		);
 	}
 
-	if ( error || ! data || data.length === 0 ) {
+	if ( error || ! data || ! data.modal || data.modal.length === 0 ) {
 		return (
 			<div className={ styles.errorWrapper }>
 				<p className={ styles.errorMessage }>
@@ -28,7 +29,7 @@ export default function LicenseTableModal() {
 		);
 	}
 
-	const hasLicenseKeys = data.some( ( license ) => license.key );
+	const hasLicenseKeys = data.modal.some( ( license ) => license.key );
 
 	return (
 		<div>
@@ -37,14 +38,16 @@ export default function LicenseTableModal() {
 					<tr>
 						<th>{ __( 'Current Plan', 'wpchill-kb' ) }</th>
 						{ hasLicenseKeys && <th>{ __( 'License Key', 'wpchill-kb' ) }</th> }
+						<th>{ __( 'Price', 'wpchill-kb' ) }</th>
 						<th>{ __( 'Action', 'wpchill-kb' ) }</th>
 					</tr>
 				</thead>
 				<tbody>
-					{ data.map( ( license, index ) => (
+					{ data.modal.map( ( license, index ) => (
 						<tr key={ index }>
 							<td>{ license.title }</td>
 							{ hasLicenseKeys && <td className={ styles.key }>{ license.key }</td> }
+							<td><Markup content={ license.price } /></td>
 							<td className={ styles.action }>
 								<Button
 									variant={ 'primary' }

@@ -17,7 +17,6 @@ class Plugin {
 
 	public function __construct() {
 		global $wpchill_kb_errors;
-
 		add_action( 'widgets_init', array( $this, 'register_widgets' ) );
 
 		try {

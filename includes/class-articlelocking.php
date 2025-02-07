@@ -34,7 +34,7 @@ class ArticleLocking {
 	public function __construct() {
 		add_action( 'add_meta_boxes_kb', array( $this, 'add_lock_meta_box' ) );
 		add_action( 'save_post_kb', array( $this, 'save_lock_meta_box' ) );
-		add_filter( 'the_content', array( $this, 'filter_locked_content' ), 999 );
+		add_filter( 'the_content', array( $this, 'filter_locked_content' ), 998 );
 		add_filter( 'wpchill_kb_article_classes', array( $this, 'add_locked_class' ), 10, 2 );
 		add_filter( 'wpchill_kb_search_args', array( $this, 'modify_search_args' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_admin_scripts' ) );
@@ -161,7 +161,7 @@ class ArticleLocking {
 	 */
 	public function modify_search_args( $args ) {
 		if ( ! is_user_logged_in() ) {
-			$args['meta_query']   = isset( $args['meta_query'] ) ? $args['meta_query'] : array();
+			$args['meta_query']   = isset( $args['meta_query'] ) ? $args['meta_query'] : array(); //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			$args['meta_query'][] = $this->get_unlocked_meta_query();
 		}
 		return $args;
@@ -195,6 +195,7 @@ class ArticleLocking {
 			$products_api      = ProductsAPI::get_instance();
 			$cheapest_download = 0;
 			$purchase_url      = '';
+			$price             = '';
 			if ( $products_api->is_edd_active() ) {
 				$cheapest_download = $products_api->get_cheapest_edd_products( $post_id, true );
 				$purchase_url      = add_query_arg(
@@ -204,9 +205,15 @@ class ArticleLocking {
 					),
 					esc_url_raw( edd_get_checkout_uri() )
 				);
+				$price             = $products_api->get_edd_formatted_price( edd_get_download_price( absint( $cheapest_download ) ) );
 			} elseif ( $products_api->is_woo_active() ) {
 				$cheapest_download = $products_api->get_cheapest_woo_products( $post_id, true );
-				$purchase_url      = add_query_arg(
+
+				$product = wc_get_product( absint( $cheapest_download ) );
+
+				$price = $products_api->get_edd_formatted_price( $product->get_price() );
+
+				$purchase_url = add_query_arg(
 					array(
 						'add-to-cart' => $cheapest_download,
 					),
@@ -214,10 +221,17 @@ class ArticleLocking {
 				);
 			}
 			if ( ! empty( $cheapest_download ) && 0 !== $cheapest_download ) {
-				$title    = esc_html__( 'You need a subscription to read this article.', 'wpchill-kb' );
-				$message  = sprintf( wp_kses_post( __( '<p class="wpchill-kb-sub-req-text">To see this article, you must have an active subscription of at least <strong>%s</strong></p>', 'wpchill-kb' ) ), html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ) );
+				$title   = esc_html__( 'You need a subscription to read this article.', 'wpchill-kb' );
+				$message = sprintf(
+						/* translators: 1$s: opening paragraph tag with class, 2$s: opening strong tag, 3$s: required subscription level name, 4$s: closing strong and paragraph tags */
+					esc_html__( '%1$s To see this article, you must have an active subscription of at least %2$s %3$s %4$s', 'wpchill-kb' ),
+					'<p class="wpchill-kb-sub-req-text">',
+					'<strong>',
+					html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
+					'</strong></p>'
+				);
 				$buttons  = sprintf( '<a href="%s" class="wpchill-kb-login-button">%s</a>', esc_url( $login_url ), esc_html__( 'Log in', 'wpchill-kb' ) );
-				$buttons .= sprintf( '<a href="%s" class="wpchill-kb-login-button">%s</a>', esc_url( $purchase_url ), esc_html__( 'Purchase plan', 'wpchill-kb' ) );
+				$buttons .= sprintf( '<a href="%s" class="wpchill-kb-login-button">%s %s</a>', esc_url( $purchase_url ), $price, esc_html__( 'Purchase plan', 'wpchill-kb' ) );
 			}
 		}
 

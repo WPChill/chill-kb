@@ -42,9 +42,7 @@ class ArticleRating {
 			return;
 		}
 
-		$rated_posts = isset( $_COOKIE['wpchill_kb_rated'] ) ? json_decode( stripslashes( $_COOKIE['wpchill_kb_rated'] ), true ) : array();
-
-
+		$rated_posts     = isset( $_COOKIE['wpchill_kb_rated'] ) ? json_decode( sanitize_text_field( wp_unslash( $_COOKIE['wpchill_kb_rated'] ) ), true ) : array();
 		$article_locking = new ArticleLocking();
 		if ( $article_locking->is_article_locked( $post->ID ) && ! is_user_logged_in() ) {
 			return;
@@ -141,7 +139,14 @@ class ArticleRating {
 	}
 
 	public function enqueue_admin_scripts( $hook ) {
-		if ( 'edit.php' !== $hook || ! isset( $_GET['post_type'] ) || 'kb' !== $_GET['post_type'] ) {
+
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return;
+		}
+
+		$screen = get_current_screen();
+
+		if ( 'edit.php' !== $hook || ! isset( $screen->post_type ) || 'kb' !== $screen->post_type ) {
 			return;
 		}
 		wp_enqueue_style( 'wpchill-kb-admin-styles', WPCHILL_KB_PLUGIN_URL . 'assets/css/admin-styles.css', array(), WPCHILL_KB_VERSION );
@@ -157,7 +162,7 @@ class ArticleRating {
 			wp_send_json_error( 'Invalid data' );
 		}
 
-		$rated_posts = isset( $_COOKIE['wpchill_kb_rated'] ) ? json_decode( stripslashes( $_COOKIE['wpchill_kb_rated'] ), true ) : array();
+		$rated_posts = isset( $_COOKIE['wpchill_kb_rated'] ) ? json_decode( sanitize_text_field( wp_unslash( $_COOKIE['wpchill_kb_rated'] ) ), true ) : array();
 
 		if ( is_array( $rated_posts ) && in_array( $post_id, $rated_posts, true ) ) {
 			wp_send_json_error( 'You have already rated this article.' );
@@ -176,7 +181,7 @@ class ArticleRating {
 		update_post_meta( $post_id, 'wpchill_kb_dislikes', $dislikes );
 
 		$rated_posts[] = $post_id;
-		setcookie( 'wpchill_kb_rated', json_encode( $rated_posts ), time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
+		setcookie( 'wpchill_kb_rated', wp_json_encode( $rated_posts ), time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
 
 		$total_votes     = $likes + $dislikes;
 		$like_percentage = $total_votes > 0 ? round( ( $likes / $total_votes ) * 100, 1 ) : 0;

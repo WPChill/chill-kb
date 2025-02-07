@@ -30,7 +30,7 @@ $wkb_child_categories = get_terms(
 ?>
 	<header class="wpchill-kb-header-wrapper">
 		<div class="wpchill-kb-header">
-			<?php echo $wkb_plugin->get_search_form(); ?>
+			<?php $wkb_plugin->get_search_form(); ?>
 		</div>
 	</header>
 	<div class="wpchill-kb-wrapper">

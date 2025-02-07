@@ -142,7 +142,7 @@ class KBCategoriesWidget extends \WP_Widget {
 			array(
 				'post_type'      => 'kb',
 				'posts_per_page' => -1,
-				'tax_query'      => array(
+				'tax_query'      => array( //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 					array(
 						'taxonomy'         => 'kb_category',
 						'field'            => 'term_id',

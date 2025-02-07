@@ -91,9 +91,12 @@ class TableOfContents {
 			if ( 'core/heading' === $block['blockName'] ) {
 				$level = isset( $block['attrs']['level'] ) ? $block['attrs']['level'] : 2;
 				if ( $level <= $max_depth ) {
-					$id = isset( $block['attrs']['anchor'] )
-						? $block['attrs']['anchor']
-						: 'h-' . sanitize_title( wp_strip_all_tags( $block['innerHTML'] ) );
+					$id = isset( $block['attrs']['anchor'] ) ? $block['attrs']['anchor'] : null;
+
+					if ( ! $id && ! empty( $block['innerHTML'] ) ) {
+						preg_match( '/id=["\'](.*?)["\']/', $block['innerHTML'], $matches );
+						$id = $matches[1] ?? 'h-' . sanitize_title( wp_strip_all_tags( $block['innerHTML'] ) );
+					}
 
 					$headings[] = array(
 						'level' => $level,

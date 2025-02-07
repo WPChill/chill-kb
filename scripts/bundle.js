@@ -31,5 +31,6 @@ archive.file( 'build/wpchill-kb.php', {
 	name: `${ pluginFolder }/wpchill-kb.php`,
 } );
 archive.file( 'build/README.md', { name: `${ pluginFolder }/README.md` } );
+archive.file( 'build/readme.txt', { name: `${ pluginFolder }/readme.txt` } );
 
 archive.finalize();

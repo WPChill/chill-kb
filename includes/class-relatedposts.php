@@ -17,7 +17,7 @@ class RelatedPosts {
 			'posts_per_page' => $limit,
 			'post__not_in'   => array( $post_id ),
 			'orderby'        => 'rand',
-			'tax_query'      => array(
+			'tax_query'      => array( //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 				'relation' => 'OR',
 				array(
 					'taxonomy' => 'kb_category',

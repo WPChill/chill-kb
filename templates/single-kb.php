@@ -7,7 +7,7 @@ $wkb_plugin->get_header();
 ?>
 	<header class="wpchill-kb-header-wrapper">
 		<div class="wpchill-kb-header">
-			<?php echo $wkb_plugin->get_search_form(); ?>
+			<?php $wkb_plugin->get_search_form(); ?>
 		</div>
 	</header>
 	<div class="wpchill-kb-wrapper">
@@ -43,7 +43,7 @@ $wkb_plugin->get_header();
 								<div class="wpchill-kb-entry-content">
 									<?php
 									// Use the filter_locked_content method to handle content display
-									echo $wkb_article_locking->filter_locked_content( get_the_content() );
+									echo $wkb_article_locking->filter_locked_content( get_the_content() ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, escaped in the rendering methods of ProductsAPI.
 									?>
 								</div>
 								<?php

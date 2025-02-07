@@ -1,10 +1,14 @@
 <?php
 /*
-Plugin Name: WPChill KB
-Description: Custom Knowledge Base management plugin
-Version: 1.0.0
-Author: WPChill
-Author URI: https://wpchill.com
+* Plugin Name:              WPChill Knowledgebase
+* Description:              Custom Knowledge Base management plugin
+* Version:                  1.0.0
+* Author:                   WPChill
+* Author URI:               https://wpchill.com
+* License:                  GPLv3 or later
+* License URI:              http://www.gnu.org/licenses/gpl-3.0.html
+* Requires PHP:             5.6
+* Text Domain:              wpchill-kb
 */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -27,22 +31,22 @@ function wpchill_kb_error_handler( $errno, $errstr, $errfile, $errline ) {
 }
 
 // Set custom error handler
-set_error_handler( 'wpchill_kb_error_handler' );
+set_error_handler( 'wpchill_kb_error_handler' ); //phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
 
 // Autoloader with error logging and class- prefix
 spl_autoload_register(
-	function ( $class ) {
+	function ( $class_name ) {
 		global $wpchill_kb_errors;
 
 		$prefix   = 'WPChill\\KB\\';
 		$base_dir = WPCHILL_KB_PLUGIN_DIR . 'includes/';
 
 		$len = strlen( $prefix );
-		if ( strncmp( $prefix, $class, $len ) !== 0 ) {
+		if ( strncmp( $prefix, $class_name, $len ) !== 0 ) {
 			return;
 		}
 
-		$relative_class = substr( $class, $len );
+		$relative_class = substr( $class_name, $len );
 		$file           = $base_dir . 'class-' . strtolower( str_replace( '\\', '-', $relative_class ) ) . '.php';
 
 		if ( file_exists( $file ) ) {

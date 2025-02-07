@@ -33,6 +33,7 @@
     "@wordpress/element": "^6.11.0",
     "@wordpress/i18n": "^5.11.0",
     "react-window": "^1.8.10",
+    "interweave": "^13.1.0",
     "react-window-infinite-loader": "^1.0.9"
   },
   "devDependencies": {
