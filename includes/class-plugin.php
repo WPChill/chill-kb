@@ -70,6 +70,11 @@ class Plugin {
 		return $this->search->get_search_form();
 	}
 
+    /**
+     * @return void
+     * If you look here http://codex.wordpress.org/Plugin_API/Action_Reference
+     * you can see that the hook called just before wp_head is get_header
+     */
 	public function get_header() {
 		if ( current_theme_supports( 'block-templates' ) ) {
 			block_template_part( 'header' );
