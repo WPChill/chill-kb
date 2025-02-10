@@ -71,14 +71,6 @@ class Plugin {
 	}
 
 	public function get_header() {
-		?>
-		<!DOCTYPE html>
-		<html <?php language_attributes(); ?>>
-		<head>
-			<?php wp_head(); ?>
-		</head>
-		<body <?php body_class(); ?>>
-		<?php
 		if ( current_theme_supports( 'block-templates' ) ) {
 			block_template_part( 'header' );
 		} else {
