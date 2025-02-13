@@ -28,7 +28,7 @@ $wkb_plugin->get_header();
 					<div class="wpchill-kb-main-content-wrap">
 						<?php
 						if ( defined( 'THE_SEO_FRAMEWORK_VERSION' ) ) {
-							echo do_shortcode( '[tsf_breadcrumb sep="›" class="wpchill-kb-breadcrumb"]' );
+							echo do_shortcode( '[tsf_breadcrumb class="wpchill-kb-breadcrumb"]' );
 						}
 						?>
 
