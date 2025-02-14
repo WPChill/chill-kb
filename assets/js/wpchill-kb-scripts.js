@@ -16,4 +16,22 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     });
+
+    document.querySelectorAll('.wpchill-sidebar-toggle').forEach(button => {
+        button.addEventListener('click', function () {
+          const parentSidebar = this.closest('.wpchill-kb-sidebar');
+      
+          if (parentSidebar) {
+            if (parentSidebar.classList.contains('open')) {
+              parentSidebar.classList.remove('open');
+            } else {
+              document.querySelectorAll('.wpchill-kb-sidebar.open').forEach(sidebar => {
+                sidebar.classList.remove('open');
+              });
+              parentSidebar.classList.add('open');
+            }
+          }
+        });
+      });
+      
 });

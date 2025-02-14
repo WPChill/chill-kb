@@ -30,7 +30,7 @@ $wkb_child_categories = get_terms(
 ?>
 	<header class="wpchill-kb-header-wrapper">
 		<div class="wpchill-kb-header">
-			<?php echo $wkb_plugin->get_search_form(); ?>
+			<?php $wkb_plugin->get_search_form(); ?>
 		</div>
 	</header>
 	<div class="wpchill-kb-wrapper">
@@ -38,11 +38,14 @@ $wkb_child_categories = get_terms(
 			<div class="wpchill-kb-sidebar-background"></div>
 			<div class="wpchill-kb-content-container">
 				<aside class="wpchill-kb-sidebar">
-					<?php
-					if ( is_active_sidebar( 'kb-sidebar' ) ) {
-						dynamic_sidebar( 'kb-sidebar' );
-					}
-					?>
+					<div class="wpchill-sidebar-content">
+						<?php
+						if ( is_active_sidebar( 'kb-sidebar' ) ) {
+							dynamic_sidebar( 'kb-sidebar' );
+						}
+						?>
+					</div>
+					<div class="wpchill-sidebar-toggle"><span class="dashicons dashicons-menu"></span></div>
 				</aside>
 				<main class="wpchill-kb-main-content">
 					<div class="wpchill-kb-main-content-wrap">
@@ -58,7 +61,7 @@ $wkb_child_categories = get_terms(
 
 								$wkb_category_icon = get_term_meta( $wkb_child_category->term_id, 'icon', true );
 								$wkb_category_icon = $wkb_category_icon ? $wkb_category_icon : 'dashicons-category';
-								
+
 								?>
 								<li class="wpchill-kb-category">
 									<a href="<?php echo esc_url( get_term_link( $wkb_child_category ) ); ?>">
@@ -73,30 +76,26 @@ $wkb_child_categories = get_terms(
 								$wkb_article_classes = apply_filters( 'wpchill_kb_article_classes', array( 'wpchill-kb-article' ), get_the_ID() );
 								?>
 								<li class="<?php echo esc_attr( implode( ' ', $wkb_article_classes ) ); ?>">
+									<?php do_action( 'wpchill_kb_before_article_listing', get_the_ID() ); ?>
 									<a href="<?php the_permalink(); ?>"><span class="wpchill-kb-icon dashicons dashicons-media-document"></span>
 										<span><?php the_title(); ?></span>
 									</a>
+									<?php do_action( 'wpchill_kb_after_article_listing', get_the_ID() ); ?>
 								</li>
 								<?php
 							endwhile;
 							?>
 						</ul>
-						<?php
-						the_posts_pagination(
-							array(
-								'prev_text' => __( 'Previous page', 'wpchill-kb' ),
-								'next_text' => __( 'Next page', 'wpchill-kb' ),
-							)
-						);
-						?>
 					</div>
 				</main>
 				<aside class="wpchill-kb-sidebar wpchill-kb-sidebar-right">
+					<div class="wpchill-sidebar-content">
 					<?php
 					if ( is_active_sidebar( 'kb-sidebar-right' ) ) {
 						dynamic_sidebar( 'kb-sidebar-right' );
 					}
 					?>
+					</div>
 				</aside>
 			</div>
 		</div>

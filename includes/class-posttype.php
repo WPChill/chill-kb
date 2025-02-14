@@ -6,7 +6,7 @@ class PostType {
 
 	public function register() {
 		$labels = array(
-			'name'               => _x( 'KB Articles', 'post type general name', 'wpchill-kb' ),
+			'name'               => _x( 'Knowledgebase', 'post type general name', 'wpchill-kb' ),
 			'singular_name'      => _x( 'KB Article', 'post type singular name', 'wpchill-kb' ),
 			'menu_name'          => _x( 'KB Articles', 'admin menu', 'wpchill-kb' ),
 			'name_admin_bar'     => _x( 'KB Article', 'add new on admin bar', 'wpchill-kb' ),

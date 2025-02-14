@@ -12,15 +12,17 @@
     line-height: 1.75;
 
     &:first-of-type {
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
+      border-top-left-radius: calc(#{$spacing-unit} / 2);
+      border-top-right-radius: calc(#{$spacing-unit} / 2);
     }
 
     &:last-of-type {
       border-bottom: 1px solid $border-color;
-      border-bottom-left-radius: 10px;
-      border-bottom-right-radius: 10px;
+      border-bottom-left-radius: calc(#{$spacing-unit} / 2);
+      border-bottom-right-radius: calc(#{$spacing-unit} / 2);
     }
+
+    overflow: hidden;
   }
 
   .wpchill-kb-icon {
@@ -37,6 +39,23 @@
   .wpchill-kb-article {
     .wpchill-kb-icon {
       background-color: #75e1b8;
+    }
+    &.wpchill-kb-locked{
+      position: relative;
+    }
+    .wpchill_kb_article_pro_badge {
+      position: absolute;
+      right: 0;
+      top: 0;
+      padding: calc(#{$spacing-unit} /4 ) calc(#{$spacing-unit} /2 );
+      font-weight: bold;
+      background-color: $pro-badge-color;
+      font-size: 16px;
+      line-height: 16px;
+      border-top-right-radius: calc(#{$spacing-unit} /2 );
+      border-bottom-left-radius: calc(#{$spacing-unit} /2 );
+      pointer-events: none;
+      color: $text-color;
     }
   }
 
@@ -126,14 +145,14 @@
       line-height: 1.75;
 
       &:first-of-type {
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
+        border-top-left-radius: calc(#{$spacing-unit} / 2);
+        border-top-right-radius: calc(#{$spacing-unit} / 2);
       }
 
       &:last-of-type {
         border-bottom: 1px solid $border-color;
-        border-bottom-left-radius: 10px;
-        border-bottom-right-radius: 10px;
+        border-bottom-left-radius: calc(#{$spacing-unit} / 2);
+        border-bottom-right-radius: calc(#{$spacing-unit} / 2);
       }
     }
 

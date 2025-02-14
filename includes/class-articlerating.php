@@ -11,6 +11,14 @@ namespace WPChill\KB;
 
 class ArticleRating {
 	private static $rating_displayed = false;
+	private static $instance         = null;
+
+	public static function get_instance() {
+		if ( null === self::$instance ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
 
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -34,26 +42,31 @@ class ArticleRating {
 			return;
 		}
 
-		$article_locking = new ArticleLocking();
+		$rated_posts     = isset( $_COOKIE['wpchill_kb_rated'] ) ? json_decode( sanitize_text_field( wp_unslash( $_COOKIE['wpchill_kb_rated'] ) ), true ) : array();
+		$article_locking = ArticleLocking::get_instance();
 		if ( $article_locking->is_article_locked( $post->ID ) && ! is_user_logged_in() ) {
 			return;
 		}
 
-		$likes    = get_post_meta( $post->ID, 'wpchill_kb_likes', true ) ?: 0;
-		$dislikes = get_post_meta( $post->ID, 'wpchill_kb_dislikes', true ) ?: 0;
+		$likes    = get_post_meta( $post->ID, 'wpchill_kb_likes', true );
+		$likes    = ( $likes && ! empty( $likes ) ) ? $likes : 0;
+		$dislikes = get_post_meta( $post->ID, 'wpchill_kb_dislikes', true );
+		$dislikes = ( $dislikes && ! empty( $dislikes ) ) ? $dislikes : 0;
 
 		?>
 		<div class="wpchill-kb-rating" data-post-id="<?php echo esc_attr( $post->ID ); ?>">
 			<div class="wpchill-kb-rating-left">
 				<span class="wpchill-kb-rating-question">Was this article helpful?</span>
 				<div class="wpchill-kb-rating-buttons">
+					<?php if ( ! is_array( $rated_posts ) || ! in_array( $post->ID, $rated_posts, true ) ) : ?>
 					<button class="wpchill-kb-rating-button wpchill-kb-like" data-rating="like">👍 Yes</button>
 					<button class="wpchill-kb-rating-button wpchill-kb-dislike" data-rating="dislike">👎 No</button>
+					<?php endif; ?>
 				</div>
 			</div>
 			<div class="wpchill-kb-rating-right">
-				<span class="wpchill-kb-likes"><?php echo $likes; ?> Yes</span>
-				<span class="wpchill-kb-dislikes"><?php echo $dislikes; ?> No</span>
+				<span class="wpchill-kb-likes"><?php echo esc_html( $likes ); ?> Yes</span>
+				<span class="wpchill-kb-dislikes"><?php echo esc_html( $dislikes ); ?> No</span>
 			</div>
 		</div>
 		<?php
@@ -126,7 +139,14 @@ class ArticleRating {
 	}
 
 	public function enqueue_admin_scripts( $hook ) {
-		if ( 'edit.php' !== $hook || ! isset( $_GET['post_type'] ) || 'kb' !== $_GET['post_type'] ) {
+
+		if ( ! function_exists( 'get_current_screen' ) ) {
+			return;
+		}
+
+		$screen = get_current_screen();
+
+		if ( 'edit.php' !== $hook || ! isset( $screen->post_type ) || 'kb' !== $screen->post_type ) {
 			return;
 		}
 		wp_enqueue_style( 'wpchill-kb-admin-styles', WPCHILL_KB_PLUGIN_URL . 'assets/css/admin-styles.css', array(), WPCHILL_KB_VERSION );
@@ -136,16 +156,22 @@ class ArticleRating {
 		check_ajax_referer( 'wpchill_kb_rating', 'security' );
 
 		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
-		$rating  = isset( $_POST['rating'] ) ? sanitize_text_field( $_POST['rating'] ) : '';
+		$rating  = isset( $_POST['rating'] ) ? sanitize_text_field( wp_unslash( $_POST['rating'] ) ) : '';
 
-		if ( ! $post_id || ! in_array( $rating, array( 'like', 'dislike' ) ) ) {
+		if ( ! $post_id || ! in_array( $rating, array( 'like', 'dislike' ), true ) ) {
 			wp_send_json_error( 'Invalid data' );
+		}
+
+		$rated_posts = isset( $_COOKIE['wpchill_kb_rated'] ) ? json_decode( sanitize_text_field( wp_unslash( $_COOKIE['wpchill_kb_rated'] ) ), true ) : array();
+
+		if ( is_array( $rated_posts ) && in_array( $post_id, $rated_posts, true ) ) {
+			wp_send_json_error( 'You have already rated this article.' );
 		}
 
 		$likes    = (int) get_post_meta( $post_id, 'wpchill_kb_likes', true );
 		$dislikes = (int) get_post_meta( $post_id, 'wpchill_kb_dislikes', true );
 
-		if ( $rating === 'like' ) {
+		if ( 'like' === $rating ) {
 			++$likes;
 		} else {
 			++$dislikes;
@@ -153,6 +179,9 @@ class ArticleRating {
 
 		update_post_meta( $post_id, 'wpchill_kb_likes', $likes );
 		update_post_meta( $post_id, 'wpchill_kb_dislikes', $dislikes );
+
+		$rated_posts[] = $post_id;
+		setcookie( 'wpchill_kb_rated', wp_json_encode( $rated_posts ), time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
 
 		$total_votes     = $likes + $dislikes;
 		$like_percentage = $total_votes > 0 ? round( ( $likes / $total_votes ) * 100, 1 ) : 0;

@@ -99,7 +99,7 @@ class KBCategoriesWidget extends \WP_Widget {
 			'taxonomy'   => 'kb_category',
 			'orderby'    => sanitize_key( $orderby ),
 			'order'      => sanitize_key( $order ),
-			'hide_empty' => false,
+			'hide_empty' => true,
 			'parent'     => 0,
 		);
 
@@ -107,10 +107,17 @@ class KBCategoriesWidget extends \WP_Widget {
 	}
 
 	private function display_categories( $categories, $show_count ) {
-		$current_category = get_queried_object();
+
+		$current_category    = get_queried_object();
+		$current_category_id = 0;
+
+		if ( $current_category && isset( $current_category->term_id ) ) {
+			$current_category_id = $current_category->term_id;
+		}
+
 		echo '<ul>';
 		foreach ( $categories as $category ) {
-			$this->render_category_with_children( $category, $current_category->term_id, $show_count );
+			$this->render_category_with_children( $category, $current_category_id, $show_count );
 		}
 		echo '</ul>';
 	}
@@ -126,7 +133,7 @@ class KBCategoriesWidget extends \WP_Widget {
 		$subcategories = get_terms(
 			array(
 				'taxonomy'   => 'kb_category',
-				'hide_empty' => false,
+				'hide_empty' => true,
 				'parent'     => $category->term_id,
 			)
 		);
@@ -135,7 +142,7 @@ class KBCategoriesWidget extends \WP_Widget {
 			array(
 				'post_type'      => 'kb',
 				'posts_per_page' => -1,
-				'tax_query'      => array(
+				'tax_query'      => array( //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 					array(
 						'taxonomy'         => 'kb_category',
 						'field'            => 'term_id',

@@ -8,9 +8,16 @@ class Search {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'wp_ajax_wpchill_kb_search', array( $this, 'ajax_search' ) );
 		add_action( 'wp_ajax_nopriv_wpchill_kb_search', array( $this, 'ajax_search' ) );
+		add_action( 'pre_get_posts', array( $this, 'filter_search_query' ) );
 	}
 
 	public function enqueue_scripts() {
+
+		// Only load on KB category and article pages.
+		if ( ! is_post_type_archive( 'kb' ) && ! is_singular( 'kb' ) && ! is_tax( 'kb_category' ) ) {
+			return;
+		}
+
 		wp_enqueue_script( 'jquery-ui-autocomplete' );
 		wp_enqueue_script(
 			'wpchill-kb-search',
@@ -32,17 +39,12 @@ class Search {
 
 	public function ajax_search() {
 		try {
-			$this->log_debug( 'AJAX search started' );
-
 			// Check nonce
 			if ( ! check_ajax_referer( 'wpchill_kb_search_nonce', 'security', false ) ) {
 				throw new \Exception( __( 'Security check failed', 'wpchill-kb' ) );
 			}
 
-			$this->log_debug( 'Nonce check passed' );
-
 			if ( ! empty( $_POST[ $this->honeypot_field_name ] ) ) {
-				$this->log_debug( 'Honeypot field filled - potential spam' );
 				throw new \Exception( __( 'Invalid request', 'wpchill-kb' ) );
 			}
 
@@ -51,15 +53,12 @@ class Search {
 				throw new \Exception( __( 'No search term provided', 'wpchill-kb' ) );
 			}
 
-			$search_term = sanitize_text_field( $_POST['search'] );
-			$this->log_debug( 'Search term: ' . $search_term );
+			$search_term = sanitize_text_field( wp_unslash( $_POST['search'] ) );
 
 			// Check for spam using Akismet
-			if ( $this->is_spam( $search_term ) ) {
+			if ( $this->is_spam( $search_term, $_POST ) ) {
 				throw new \Exception( __( 'This search query has been identified as potential spam.', 'wpchill-kb' ) );
 			}
-
-			$this->log_debug( 'Spam check passed' );
 
 			$args = array(
 				'post_type'      => 'kb',
@@ -69,7 +68,6 @@ class Search {
 			);
 
 			$query = new \WP_Query( $args );
-			$this->log_debug( 'WP_Query executed' );
 
 			$results = array();
 
@@ -84,12 +82,8 @@ class Search {
 				wp_reset_postdata();
 			}
 
-			$this->log_debug( 'Search results: ' . print_r( $results, true ) );
-
 			wp_send_json_success( $results );
-
 		} catch ( \Exception $e ) {
-			$this->log_debug( 'Exception caught: ' . $e->getMessage() );
 			wp_send_json_error(
 				array(
 					'message' => $e->getMessage(),
@@ -99,12 +93,11 @@ class Search {
 		}
 	}
 
-	private function is_spam( $search_term ) {
-		$this->log_debug( 'Checking for spam' );
+	private function is_spam( $search_term, $postdata ) {
 		if ( $this->is_akismet_active() ) {
 			global $akismet_api_host, $akismet_api_port;
 
-			$akismet_data = $this->get_akismet_data( $search_term );
+			$akismet_data = $this->get_akismet_data( $search_term, $postdata );
 
 			$query_string = http_build_query( $akismet_data );
 			$request      = "POST /1.1/comment-check HTTP/1.0\r\n" .
@@ -115,32 +108,33 @@ class Search {
 						"\r\n" .
 						$query_string;
 			$response     = '';
-
-			if ( false !== ( $fs = @fsockopen( $akismet_api_host, $akismet_api_port, $errno, $errstr, 10 ) ) ) {
-				fwrite( $fs, $request );
+			$fs           = @fsockopen( $akismet_api_host, $akismet_api_port, $errno, $errstr, 10 ); //phpcs:ignore
+			if ( false !== $fs ) {
+				fwrite( $fs, $request ); //phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite
 				while ( ! feof( $fs ) ) {
 					$response .= fgets( $fs, 1160 );
 				}
-				fclose( $fs );
+				fclose( $fs ); //phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 				$response = explode( "\r\n\r\n", $response, 2 );
-				$this->log_debug( 'Akismet raw response: ' . $response[1] );
-				return $response[1] === 'true';
+				return true === $response[1];
 			} else {
-				$this->log_debug( 'Failed to connect to Akismet' );
 				return false;
 			}
 		}
-
-		$this->log_debug( 'Akismet not available or not active' );
 		return false; // If Akismet is not available, don't block any searches
 	}
 
-	private function get_akismet_data( $search_term ) {
-		return array(
+	private function get_akismet_data( $search_term, $postdata ) {
+
+		$user_ip    = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+		$referrer   = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
+
+		$data = array(
 			'blog'                     => get_option( 'home' ),
-			'user_ip'                  => $_SERVER['REMOTE_ADDR'],
-			'user_agent'               => $_SERVER['HTTP_USER_AGENT'],
-			'referrer'                 => $_SERVER['HTTP_REFERER'],
+			'user_ip'                  => $user_ip,
+			'user_agent'               => $user_agent,
+			'referrer'                 => $referrer,
 			'comment_type'             => 'message',
 			'comment_author'           => '',
 			'comment_author_email'     => '',
@@ -150,7 +144,7 @@ class Search {
 			'blog_charset'             => get_option( 'blog_charset' ),
 			'permalink'                => get_site_url(),
 			'honeypot_field_name'      => $this->honeypot_field_name,
-			$this->honeypot_field_name => $_POST[ $this->honeypot_field_name ],
+			$this->honeypot_field_name => isset( $postdata[ $this->honeypot_field_name ] ) ? sanitize_text_field( wp_unslash( $postdata[ $this->honeypot_field_name ] ) ) : '',
 		);
 
 		// Add comment context
@@ -197,14 +191,7 @@ class Search {
 		return is_callable( array( 'Akismet', 'get_api_key' ) ) && (bool) \Akismet::get_api_key();
 	}
 
-	private function log_debug( $message ) {
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
-			error_log( '[WPChill KB Search] ' . $message );
-		}
-	}
-
 	public function get_search_form() {
-		ob_start();
 		?>
 		<form role="search" method="get" class="wpchill-kb-search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
 			<label for="wpchill-kb-search-input" class="screen-reader-text"><?php esc_html_e( 'Search Knowledge Base:', 'wpchill-kb' ); ?></label>
@@ -214,6 +201,11 @@ class Search {
 			<button type="submit" class="wpchill-kb-search-submit"><?php esc_html_e( 'Search', 'wpchill-kb' ); ?></button>
 		</form>
 		<?php
-		return ob_get_clean();
+	}
+
+	public function filter_search_query( $query ) {
+		if ( $query->is_search() && ! is_admin() && isset( $_GET['post_type'] ) && 'wpchill_kb' === $_GET['post_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$query->set( 'post_type', 'kb' );
+		}
 	}
 }

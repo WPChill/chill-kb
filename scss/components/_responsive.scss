@@ -1,0 +1,71 @@
+@media (max-width: 1024px) {
+    body {
+        
+        .wpchill-kb-content-container {
+            display: block;
+            .wpchill-kb-sidebar {
+                top: 0;
+                width: 80%;
+                height: 100%;
+                overflow: visible;
+                position: absolute;
+                z-index: 99;
+                margin-left: -80%;
+                transition: margin-left 0.5s ease;
+                box-sizing: border-box;
+                .wpchill-sidebar-toggle {
+                    position: absolute;
+                    top: 50%;
+                    right: -40px;
+                    padding: 10px;
+                    display: flex;
+                    background-color: $primary-color;
+                    align-items: center;
+                    justify-content: center;
+                    color: #fff;
+                    border-top-right-radius: 5px;
+                    border-bottom-right-radius: 5px;
+                    transform: translateY(calc( -50% - 40px ));
+                    .dashicons {
+                        transition: transform 0.3s ease;
+                    }
+                }
+            }
+            .wpchill-kb-sidebar.open {
+                margin-left: 0;
+                .wpchill-sidebar-toggle {
+                    .dashicons {
+                        transform: rotate(180deg);
+                    }
+                }
+            }
+            .wpchill-kb-sidebar.wpchill-kb-sidebar-right{
+                .wpchill-sidebar-toggle {
+                    top: 50%;
+                    transform: translateY(calc( -50% + 40px ));
+                    .wpchill-toggle-toc {
+                        writing-mode: vertical-lr;
+                        text-orientation: upright;
+                        font-weight: 600;
+                    }
+                }
+            }
+        }
+        .wpchill-kb-main-content {
+            width: 100%;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            padding: calc(#{$spacing-unit} * 3);
+        }
+    }
+}
+@media (min-width: 1024px) {
+    .wpchill-kb-content-container {
+        .wpchill-kb-sidebar {
+            .wpchill-sidebar-toggle {
+                display: none;
+            }
+        }
+    }
+}

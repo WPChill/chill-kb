@@ -4,3 +4,6 @@ stubs
 *.zip
 .DS_Store
 public
+/assets/lock-select
+/assets/license-modal
+.idea

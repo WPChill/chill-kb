@@ -1,8 +1,7 @@
 .wpchill-kb-sidebar {
-  padding: #{$spacing-unit};
   border-right: 1px solid $border-color;
   box-sizing: content-box;
-  width: calc( 20% - ( #{$spacing-unit} * 2 ) );
+  width: 20%;
   background-color: #fafbff;
   overflow-y: auto;
   position: sticky;
@@ -15,6 +14,16 @@
   &.wpchill-kb-sidebar-right{
     border-left: 1px solid $border-color;
     border-right: unset;
+    .wpchill-sidebar-content {
+      p{
+        margin: 0;
+      }
+    }
+  }
+  .wpchill-sidebar-content {
+    padding: #{$spacing-unit};
+    overflow-y: auto;
+    height: 100%;
   }
 
   &:after {
