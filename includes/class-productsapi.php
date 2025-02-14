@@ -247,6 +247,7 @@ class ProductsAPI {
 
 			$lock_data['modal'][] = array(
 				'type'     => __( 'Purchase', 'wpchill-kb' ),
+				'action'   => 'purchase',
 				'download' => $cheapest_download,
 				'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 				'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
@@ -295,7 +296,8 @@ class ProductsAPI {
 				// Renew the license
 				$lock_data['modal'][] = array(
 					'type'     => __( 'Renew', 'wpchill-kb' ),
-					'download' => $download,
+					'action'   => 'renew',
+					'download' => $cheapest_download,
 					'title'    => html_entity_decode( get_the_title( $download ), ENT_QUOTES, 'UTF-8' ),
 					'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 					'price'    => html_entity_decode( $this->get_edd_formatted_price( edd_get_download_price( $cheapest_download ) ) ),
@@ -309,7 +311,8 @@ class ProductsAPI {
 						$upgrade_price        = absint( edd_sl_get_license_upgrade_cost( $license->ID, $upgrade_id ) );
 						$lock_data['modal'][] = array(
 							'type'     => __( 'Upgrade', 'wpchill-kb' ),
-							'download' => $upgrade['download_id'],
+							'action'   => 'upgrade',
+							'download' => $cheapest_download,
 							'title'    => html_entity_decode( get_the_title( $download ), ENT_QUOTES, 'UTF-8' ),
 							'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 							'price'    => html_entity_decode( $this->get_edd_formatted_price( $upgrade_price ) ),
@@ -332,6 +335,7 @@ class ProductsAPI {
 			);
 			$lock_data['modal'][] = array(
 				'type'     => __( 'Purchase', 'wpchill-kb' ),
+				'action'   => 'purchase',
 				'download' => $cheapest_download,
 				'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 				'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
@@ -479,6 +483,7 @@ class ProductsAPI {
 
 			$lock_data['modal'][] = array(
 				'type'     => __( 'Purchase', 'wpchill-kb' ),
+				'action'   => 'purchase',
 				'download' => $cheapest_download,
 				'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 				'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
@@ -506,6 +511,7 @@ class ProductsAPI {
 						$product              = wc_get_product( $download );
 						$lock_data['modal'][] = array(
 							'type'     => __( 'Resubscribe', 'wpchill-kb' ),
+							'action'   => 'renew',
 							'download' => $download,
 							'title'    => html_entity_decode( get_the_title( $download ), ENT_QUOTES, 'UTF-8' ),
 							'price'    => $this->get_woo_formatted_price( $price ),
@@ -521,6 +527,7 @@ class ProductsAPI {
 						);
 						$lock_data['modal'][] = array(
 							'type'     => __( 'Purchase', 'wpchill-kb' ),
+							'action'   => 'purchase',
 							'download' => $cheapest_download,
 							'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 							'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
@@ -540,6 +547,7 @@ class ProductsAPI {
 
 					$lock_data['modal'][] = array(
 						'type'     => __( 'Purchase', 'wpchill-kb' ),
+						'action'   => 'purchase',
 						'download' => $cheapest_download,
 						'title'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
 						'least'    => html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
@@ -557,7 +565,6 @@ class ProductsAPI {
 	private function render_lock_screen( $data ) {
 		$html  = '<div class="wpchill-kb-locked-message">';
 		$html .= ! empty( $data['modal'] ) ? $this->button_or_modal( $data['modal'] ) : $this->button_or_modal();
-		$html .= ! empty( $data['products'] ) ? $this->products_badges( $data['products'] ) : '';
 		$html .= '</div>';
 
 		return $html;
@@ -580,13 +587,42 @@ class ProductsAPI {
 					<p>' . esc_html__( 'This access this article please contact the site administrator.', 'wpchill-kb' ) . '</p>';
 		}
 
+		$download_id = isset( $data[0]['download'] ) && 0 != absint( $data[0]['download'] ) ? absint( $data[0]['download'] ) : false;
+
+		if ( ! $download_id ) {
+			return '<h3>' . esc_html__( 'This article is locked and cannot be viewed.', 'wpchill-kb' ) . '</h3>
+					<p>' . esc_html__( 'This access this article please contact the site administrator.', 'wpchill-kb' ) . '</p>';
+		}
+
+		$title   = esc_html__( 'Access Restricted: Subscription Required', 'wpchill-kb' );
+		$message = sprintf(
+			/* translators: %1$s opening paragraph tag with class, %2$s opening strong tag, %3$s required subscription level name, %4$s closing strong tag, %5$s closing paragraph tag */
+			esc_html__( '%1$s To read this article, you need an active %2$s %3$s %4$s subscription. %5$s', 'wpchill-kb' ),
+			'<p class="wpchill-kb-sub-req-text">',
+			'<strong>',
+			html_entity_decode( get_the_title( $download_id ), ENT_QUOTES, 'UTF-8' ),
+			'</strong>',
+			'</p>'
+		);
+
+		$products = $this->get_edd_package_products( $download_id );
+
+		$message .= sprintf(
+			/* translators: %1$s opening paragraph tag with class, %2$s premium features list, %3$s line break, %4$s opening anchor tag to pricing page, %5$s closing anchor and paragraph tag */
+			esc_html__( '%1$s Premium features: %2$s, and more! %3$s Find the full features on our %4$s pricing page. %5$s', 'wpchill-kb' ),
+			'<p class="wpchill-kb-sub-features-text">',
+			$this->products_badges( $products ),
+			'</br>',
+			'<a href="/pricing" class="wpchill-kb-inline-button">',
+			'</a></p>'
+		);
+
 		return sprintf(
-			'<h2 style="font-size:30px;">%s</h2>
-				<p class="wpchill-kb-sub-req-text">%s</p>
-				<p>%s</p>',
-			esc_html__( 'You need a subscription to read this article.', 'wpchill-kb' ),
-			/* translators: 1$s: opening strong tag, 2$s: required subscription level name, 3$s: closing strong tag */
-			sprintf( esc_html__( 'To see this article, you must have an active subscription of at least %1$s %2$s %3$s', 'wpchill-kb' ), '<strong>', isset( $data[0]['least'] ) ? $data[0]['least'] : $data[0]['title'], '</strong>', ),
+			'<h2 class="wpchill-kb-locked-message-header">%s</h2>
+				%s
+				<div class="wpchill-kb-buttons-wrapp">%s</div>',
+			$title,
+			$message,
 			1 === count( $data ) ? wp_kses_post( $this->render_button( $data[0] ) ) : $this->render_modal_root(),
 		);
 	}
@@ -599,11 +635,11 @@ class ProductsAPI {
 	 */
 	private function render_button( $data ) {
 		return sprintf(
-			'<a href="%s" class="wpchill-kb-login-button">%s %s %s</a>',
+			'<a href="%s" class="wpchill-kb-login-button">%s %s – %s</a>',
 			esc_url( $data['url'] ),
-			isset( $data['price'] ) ? wp_kses_post( $data['price'] ) : '',
 			esc_html( $data['type'] ),
-			esc_html( $data['title'] )
+			esc_html( $data['title'] ),
+			isset( $data['price'] ) ? wp_kses_post( $data['price'] ) : '',
 		);
 	}
 
@@ -625,38 +661,34 @@ class ProductsAPI {
 		);
 	}
 
-	private function products_badges( $products ) {
-		$html  = '<p class="wpchill-kb-badges-info">' . esc_html__( 'The subscription grants you access to the following addons:', 'wpchill-kb' ) . '</p>';
-		$html .= '<ul class="wpchill-kb-addons-list">';
-
-		if ( ! empty( $products ) && is_array( $products ) ) {
-			foreach ( $products as $product ) {
-				$name = isset( $product['name'] ) ? esc_html( $product['name'] ) : '';
-
-				$html .= '<li class="wpchill-kb-addon">
-							<span class="wpchill-kb-checkmark dashicons dashicons-yes-alt"></span>
-							<span class="wpchill-kb-addon-name">' . $name . '</span>
-						  </li>';
-			}
+	public function products_badges( $products ) {
+		if ( empty( $products ) || ! is_array( $products ) ) {
+			return '';
 		}
 
-		$html .= '</ul>';
+		$products = array_slice( $products, 0, 3 );
+		$names    = array_map(
+			function ( $product ) {
+				return isset( $product['name'] ) ? esc_html( $product['name'] ) : '';
+			},
+			$products
+		);
 
-		return $html;
+		return '<span class="wpchill-kb-addons-list">' . implode( ', ', $names ) . '</span>';
 	}
 
 
 	public function get_edd_formatted_price( $price ) {
 		$price = number_format( $price, 2, '.', '' );
-		return sprintf( '<span wpchill-kb-price-wrap><sup>%s</sup><span wpchill-kb-price>%s</span></span>', edd_currency_symbol( edd_get_currency() ), $price );
+		return sprintf( '<span>%s<span wpchill-kb-price>%s</span></span>', edd_currency_symbol( edd_get_currency() ), $price );
 	}
 
 	public function get_woo_formatted_price( $price ) {
 		$price = number_format( $price, 2, '.', '' );
-		return sprintf( '<span wpchill-kb-price-wrap><sup>%s</sup><span wpchill-kb-price>%s</span></span>', get_woocommerce_currency_symbol(), $price );
+		return sprintf( '<span>%s<span wpchill-kb-price>%s</span></span>', get_woocommerce_currency_symbol(), $price );
 	}
 
-	private function get_edd_package_products( $package_id ) {
+	public function get_edd_package_products( $package_id ) {
 
 		$bundled_addons = get_post_meta( $package_id, '_edd_bundled_products', true );
 

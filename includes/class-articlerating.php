@@ -43,7 +43,7 @@ class ArticleRating {
 		}
 
 		$rated_posts     = isset( $_COOKIE['wpchill_kb_rated'] ) ? json_decode( sanitize_text_field( wp_unslash( $_COOKIE['wpchill_kb_rated'] ) ), true ) : array();
-		$article_locking = new ArticleLocking();
+		$article_locking = ArticleLocking::get_instance();
 		if ( $article_locking->is_article_locked( $post->ID ) && ! is_user_logged_in() ) {
 			return;
 		}

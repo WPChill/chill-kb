@@ -76,9 +76,11 @@ $wkb_child_categories = get_terms(
 								$wkb_article_classes = apply_filters( 'wpchill_kb_article_classes', array( 'wpchill-kb-article' ), get_the_ID() );
 								?>
 								<li class="<?php echo esc_attr( implode( ' ', $wkb_article_classes ) ); ?>">
+									<?php do_action( 'wpchill_kb_before_article_listing', get_the_ID() ); ?>
 									<a href="<?php the_permalink(); ?>"><span class="wpchill-kb-icon dashicons dashicons-media-document"></span>
 										<span><?php the_title(); ?></span>
 									</a>
+									<?php do_action( 'wpchill_kb_after_article_listing', get_the_ID() ); ?>
 								</li>
 								<?php
 							endwhile;

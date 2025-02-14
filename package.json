@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "WPChill Knowledge Base Plugin",
   "scripts": {
-    "sass:watch": "sass --watch /assets/scss:assets/css",
-    "sass:compile": "sass assets/scss/wpchill-kb.scss assets/css/wpchill-kb-styles.css --style compressed",
-    "sass:compile-admin": "sass assets/scss/admin/wpchill-kb-admin.scss assets/css/admin/wpchill-kb-styles-admin.css --style compressed",
+    "sass:watch": "sass --watch assets/scss:assets/css",
+    "sass:compile": "sass scss/wpchill-kb.scss assets/css/wpchill-kb-styles.css --style compressed",
+    "sass:compile-admin": "sass scss/admin/wpchill-kb-admin.scss assets/css/admin/wpchill-kb-styles-admin.css --style compressed",
     "build:lock-select": "wp-scripts build apps/lock-select/index.js --output-path=./assets/lock-select",
     "start:lock-select": "wp-scripts start apps/lock-select/index.js --output-path=./assets/lock-select",
     "build:license-modal": "wp-scripts build apps/license-modal/index.js --output-path=./assets/license-modal",

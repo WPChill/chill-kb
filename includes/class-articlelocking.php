@@ -28,6 +28,30 @@ class ArticleLocking {
 	 */
 	const PRODUCTS_META_KEY = '_wpchill_kb_locked_products';
 
+
+	/**
+	 * Holds the class object
+	 *
+	 * @since 1.0.0
+	 *
+	 * @var object
+	 */
+	public static $instance;
+
+	/**
+	 * Returns the singleton instance of the class.
+	 *
+	 * @return object The ArticleLocking object.
+	 * @since 1.0.0
+	 */
+	public static function get_instance() {
+		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof ArticleLocking ) ) {
+			self::$instance = new ArticleLocking();
+		}
+
+		return self::$instance;
+	}
+
 	/**
 	 * Constructor.
 	 */
@@ -39,6 +63,7 @@ class ArticleLocking {
 		add_filter( 'wpchill_kb_search_args', array( $this, 'modify_search_args' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_admin_scripts' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ) );
+		add_action( 'wpchill_kb_after_article_listing', array( $this, 'render_pro_badge' ) );
 	}
 
 	/**
@@ -147,7 +172,7 @@ class ArticleLocking {
 	 * @return array Modified array of post classes.
 	 */
 	public function add_locked_class( $classes, $post_id ) {
-		if ( $this->is_article_locked( $post_id ) ) {
+		if ( $this->is_article_locked( $post_id ) && ! in_array( 'wpchill-kb-locked', $classes, true ) ) {
 			$classes[] = 'wpchill-kb-locked';
 		}
 		return $classes;
@@ -221,25 +246,39 @@ class ArticleLocking {
 				);
 			}
 			if ( ! empty( $cheapest_download ) && 0 !== $cheapest_download ) {
-				$title   = esc_html__( 'You need a subscription to read this article.', 'wpchill-kb' );
+				$title   = esc_html__( 'Access Restricted: Subscription Required', 'wpchill-kb' );
 				$message = sprintf(
-						/* translators: 1$s: opening paragraph tag with class, 2$s: opening strong tag, 3$s: required subscription level name, 4$s: closing strong and paragraph tags */
-					esc_html__( '%1$s To see this article, you must have an active subscription of at least %2$s %3$s %4$s', 'wpchill-kb' ),
+					/* translators: %1$s opening paragraph tag with class, %2$s opening strong tag, %3$s required subscription level name, %4$s closing strong tag, %5$s closing paragraph tag */
+					esc_html__( '%1$s To read this article, you need an active %2$s %3$s %4$s subscription. %5$s', 'wpchill-kb' ),
 					'<p class="wpchill-kb-sub-req-text">',
 					'<strong>',
 					html_entity_decode( get_the_title( $cheapest_download ), ENT_QUOTES, 'UTF-8' ),
-					'</strong></p>'
+					'</strong>',
+					'</p>'
 				);
+
+				$products = $products_api->get_edd_package_products( $cheapest_download );
+
+				$message .= sprintf(
+					/* translators: %1$s opening paragraph tag with class, %2$s premium features list, %3$s line break, %4$s opening anchor tag to pricing page, %5$s closing anchor and paragraph tag */
+					esc_html__( '%1$s Premium features: %2$s, and more! %3$s Find the full features on our %4$s pricing page. %5$s', 'wpchill-kb' ),
+					'<p class="wpchill-kb-sub-features-text">',
+					$products_api->products_badges( $products ),
+					'</br>',
+					'<a href="/pricing" class="wpchill-kb-inline-button">',
+					'</a></p>'
+				);
+
 				$buttons  = sprintf( '<a href="%s" class="wpchill-kb-login-button">%s</a>', esc_url( $login_url ), esc_html__( 'Log in', 'wpchill-kb' ) );
-				$buttons .= sprintf( '<a href="%s" class="wpchill-kb-login-button">%s %s</a>', esc_url( $purchase_url ), $price, esc_html__( 'Purchase plan', 'wpchill-kb' ) );
+				$buttons .= sprintf( '<a href="%s" class="wpchill-kb-login-button">%s – %s</a>', esc_url( $purchase_url ), esc_html__( 'Purchase plan', 'wpchill-kb' ), $price );
 			}
 		}
 
 		return sprintf(
 			'<div class="wpchill-kb-locked-message">
-				<h2 style="font-size:30px;">%s</h2>
+				<h2 class="wpchill-kb-locked-message-header">%s</h2>
 				%s
-				<p>%s</p>
+				<div class="wpchill-kb-buttons-wrapp">%s</div>
 			</div>',
 			$title,
 			$message,
@@ -338,5 +377,13 @@ class ArticleLocking {
 			array( 'wp-components' ),
 			$enqueue['version']
 		);
+	}
+
+	public function render_pro_badge( $post_id ) {
+		if ( $this->is_article_locked( $post_id ) ) {
+			?>
+			<span class="wpchill_kb_article_pro_badge"><?php esc_html_e( 'PRO', 'wpchill-kb' ); ?></span>
+			<?php
+		}
 	}
 }

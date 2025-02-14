@@ -12,6 +12,12 @@ class Search {
 	}
 
 	public function enqueue_scripts() {
+
+		// Only load on KB category and article pages.
+		if ( ! is_post_type_archive( 'kb' ) && ! is_singular( 'kb' ) && ! is_tax( 'kb_category' ) ) {
+			return;
+		}
+
 		wp_enqueue_script( 'jquery-ui-autocomplete' );
 		wp_enqueue_script(
 			'wpchill-kb-search',

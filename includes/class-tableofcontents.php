@@ -61,7 +61,7 @@ class TableOfContents {
 
 		$headings = $this->extract_headings_from_blocks( $blocks, $atts['depth'] );
 
-		if ( empty( $headings ) ) {
+		if ( empty( $headings ) || 2 > count( $headings ) ) {
 			return '';
 		}
 

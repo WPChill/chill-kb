@@ -28,7 +28,7 @@ class Plugin {
 			$this->search            = new Search();
 			$this->article_rating    = ArticleRating::get_instance();
 			$this->sidebar           = new Sidebar();
-			$this->article_locking   = new ArticleLocking();
+			$this->article_locking   = ArticleLocking::get_instance();
 			$this->table_of_contents = new TableOfContents();
 			$this->rest_api          = new RestAPI();
 
@@ -70,31 +70,43 @@ class Plugin {
 		return $this->search->get_search_form();
 	}
 
-    /**
-     * @return void
-     * If you look here http://codex.wordpress.org/Plugin_API/Action_Reference
-     * you can see that the hook called just before wp_head is get_header
-     */
+
+	/**
+	 * Renders the header for FSE or non FSE themes.
+	 * for the FSE themes along with the header block display we have to render wp_head aswell.
+	*/
 	public function get_header() {
 		if ( current_theme_supports( 'block-templates' ) ) {
+			?>
+			<html <?php language_attributes(); ?>>
+			<head>
+				<?php wp_head(); ?>
+			</head>
+			<body <?php body_class(); ?>>
+			<?php
 			block_template_part( 'header' );
 		} else {
 			get_header();
 		}
 	}
 
+	/**
+	 * Renders the footer for FSE or non FSE themes.
+	 * for the FSE themes along with the footer block display we have to render wp_footer aswell.
+	*/
 	public function get_footer() {
-		?>
-		<footer class="wp-block-template-part">
-			<?php
-			if ( current_theme_supports( 'block-templates' ) ) {
+
+		if ( current_theme_supports( 'block-templates' ) ) {
+			?>
+				<footer class="wp-block-template-part">
+				<?php
 				block_template_part( 'footer' );
 				wp_footer();
-			} else {
-				get_footer();
-			}
-			?>
-		</footer>
-		<?php
+				?>
+				</footer>
+				<?php
+		} else {
+			get_footer();
+		}
 	}
 }

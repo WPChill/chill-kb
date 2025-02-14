@@ -26,7 +26,12 @@ $wpchill-font-family: Arial, sans-serif;
   color: $color-danger-text;
   padding: $padding-standard;
   margin-bottom: $margin-bottom;
-  text-align: center;
+  text-align: left;
+
+  .wpchill-kb-locked-message-header{
+    text-align: center;
+    font-size:30px;
+  }
 
   .wpchill-kb-login-button {
     display: inline-block;
@@ -49,27 +54,17 @@ $wpchill-font-family: Arial, sans-serif;
     font-size: 21px;
   }
   .wpchill-kb-sub-req-text{
-    font-size: 22px;
+    font-size: 18px;
   }
-  .wpchill-kb-badges-info {
-    text-align: left;
-    margin: 0;
+  .wpchill-kb-sub-features-text{
+    font-size: 18px;
+  }
+  .wpchill-kb-buttons-wrapp{
+    text-align: center;
   }
   p{
     strong{
       white-space: nowrap;
-    }
-  }
-
-  .wpchill-kb-addons-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    .wpchill-kb-checkmark {
-      color: green;
     }
   }
   
