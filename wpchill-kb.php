@@ -19,6 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'WPCHILL_KB_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WPCHILL_KB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WPCHILL_KB_VERSION', '1.0.0' );
+defined( 'WPCHILL_KB_PRICING_URL' ) || define( 'WPCHILL_KB_PRICING_URL', '/pricing' );
 
 // Error collection array
 $wpchill_kb_errors = array();

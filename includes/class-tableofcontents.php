@@ -75,6 +75,8 @@ class TableOfContents {
 
 		$toc .= '</ul></div>';
 
+		$toc .= '<div class="wpchill-sidebar-toggle wpchill-sidebar-toggle-right"><span class="wpchill-toggle-toc">' . esc_html__( 'TOC', 'wpchill-kb' ) . '</span></div>';
+
 		return $toc;
 	}
 

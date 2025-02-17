@@ -65,7 +65,6 @@ $wkb_plugin->get_header();
 						}
 						?>
 					</div>
-					<div class="wpchill-sidebar-toggle"><span class="wpchill-toggle-toc"><?php esc_html_e( 'TOC', 'wpchill-kb' ); ?></span></div>
 				</aside>
 			</div>
 		</div>

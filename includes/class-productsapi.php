@@ -613,7 +613,7 @@ class ProductsAPI {
 			'<p class="wpchill-kb-sub-features-text">',
 			$this->products_badges( $products ),
 			'</br>',
-			'<a href="/pricing" class="wpchill-kb-inline-button">',
+			'<a href="' . WPCHILL_KB_PRICING_URL . '" class="wpchill-kb-inline-button">',
 			'</a></p>'
 		);
 

@@ -62,15 +62,37 @@ $wpchill-font-family: Arial, sans-serif;
   .wpchill-kb-buttons-wrapp{
     text-align: center;
   }
-  p{
-    strong{
-      white-space: nowrap;
-    }
-  }
-  
   .wpchill-kb-addon {
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+}
+
+// Responsiveness
+@media (max-width: 1024px) {
+  .wpchill-kb-locked-message {
+    .wpchill-kb-locked-message-header{
+      font-size: 24px;
+    }
+    .wpchill-kb-login-button {
+      padding: 10px 15px;
+      font-size: 14px;
+      line-height: 21px;
+      margin-bottom: 10px;
+      margin-right: 0;
+    }
+    .wpchill-kb-login-text{
+      font-size: 16px;
+    }
+    .wpchill-kb-sub-req-text{
+      font-size: 16px;
+    }
+    .wpchill-kb-sub-features-text{
+      font-size: 16px;
+    }
+    .wpchill-kb-buttons-wrapp{
+      
+    }
   }
 }

@@ -26,6 +26,8 @@
                     border-top-right-radius: 5px;
                     border-bottom-right-radius: 5px;
                     transform: translateY(calc( -50% - 40px ));
+                    min-width: 40px;
+                    cursor: pointer;
                     .dashicons {
                         transition: transform 0.3s ease;
                     }
@@ -33,6 +35,7 @@
             }
             .wpchill-kb-sidebar.open {
                 margin-left: 0;
+                z-index: 999;
                 .wpchill-sidebar-toggle {
                     .dashicons {
                         transform: rotate(180deg);
@@ -47,6 +50,7 @@
                         writing-mode: vertical-lr;
                         text-orientation: upright;
                         font-weight: 600;
+                        line-height: 14px;
                     }
                 }
             }

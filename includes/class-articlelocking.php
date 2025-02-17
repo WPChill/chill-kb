@@ -214,7 +214,7 @@ class ArticleLocking {
 
 		$title   = esc_html__( 'Log in to read this article.', 'wpchill-kb' );
 		$message = wp_kses_post( __( '<p class="wpchill-kb-login-text">To access this content, log in or create an account by making a purchase.', 'wpchill-kb' ) );
-		$buttons = sprintf( '<a href="/pricing" class="wpchill-kb-login-button">%s</a><a href="%s" class="wpchill-kb-login-button">%s</a>', esc_html__( 'See pricing', 'wpchill-kb' ), esc_url( $login_url ), esc_html__( 'Log in', 'wpchill-kb' ) );
+		$buttons = sprintf( '<a href="%s" class="wpchill-kb-login-button">%s</a><a href="%s" class="wpchill-kb-login-button">%s</a>', WPCHILL_KB_PRICING_URL, esc_html__( 'See pricing', 'wpchill-kb' ), esc_url( $login_url ), esc_html__( 'Log in', 'wpchill-kb' ) );
 
 		if ( 'active_subscription' === get_post_meta( $post_id, self::TYPE_META_KEY, true ) ) {
 			$products_api      = ProductsAPI::get_instance();
@@ -265,7 +265,7 @@ class ArticleLocking {
 					'<p class="wpchill-kb-sub-features-text">',
 					$products_api->products_badges( $products ),
 					'</br>',
-					'<a href="/pricing" class="wpchill-kb-inline-button">',
+					'<a href="' . WPCHILL_KB_PRICING_URL . '" class="wpchill-kb-inline-button">',
 					'</a></p>'
 				);
 
