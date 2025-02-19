@@ -354,13 +354,13 @@ class ArticleLocking {
 			return;
 		}
 
-		$asset_file = require WPCHILL_KB_PLUGIN_DIR . '/assets/license-modal/index.asset.php';
+		$asset_file = require WPCHILL_KB_PLUGIN_DIR . 'assets/license-modal/index.asset.php';
 		$enqueue    = array(
 			'handle'       => 'wpchill-kb-license-modal',
 			'dependencies' => $asset_file['dependencies'],
 			'version'      => $asset_file['version'],
-			'script'       => WPCHILL_KB_PLUGIN_URL . '/assets/license-modal/index.js',
-			'style'        => WPCHILL_KB_PLUGIN_URL . '/assets/license-modal/index.css',
+			'script'       => WPCHILL_KB_PLUGIN_URL . 'assets/license-modal/index.js',
+			'style'        => WPCHILL_KB_PLUGIN_URL . 'assets/license-modal/index.css',
 		);
 
 		wp_enqueue_script(
